@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend</title>
+
+    <link rel="import" href="/Elements/Elements.html"/>
+</head>
+    <body>
+        <template is="auto-binding" id="site">
+            
+            <core-ajax id="ajax"
+                       auto
+                       url="/home/site"
+                       params=''
+                       handleas="json"
+                       method="get"
+                       on-core-response="{{HandleSite}}">
+            </core-ajax>
+
+            <header>
+                <h1>{{Site.Name}}</h1>
+                <nav>
+                    <template repeat="{{page in Site.Pages}}">
+                        <button on-tap="{{SelectPage}}">{{page.Name}}</button>
+                    </template>
+                </nav>
+            </header>
+
+            <core-pages id="pages" selected="{{SelectedPage}}" valueattr="data-pagename">
+                <template repeat="{{page in Site.Pages}}">
+                    <section data-pagename="{{page.Name}}">
+                        <el-page data="{{page}}"></el-page>
+                    </section>
+                </template>
+            </core-pages>
+
+        </template>
+
+        <script>
+            
+            var site = document.getElementById("site");
+
+            site.ready = function() {
+                this.HandleSite = function(res) {
+                    site.Site = res.detail.response;
+                    console.log(site.Site);
+                    if (site.Site.Pages[0] != null)
+                        site.SelectedPage = site.Site.Pages[0].Name;
+                };
+                this.SelectPage = function(event, a, e) {
+                    site.SelectedPage = e.innerHTML;
+                };
+            };
+
+        </script>
+    </body>
+</html>

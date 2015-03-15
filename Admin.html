@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin</title>
+
+    <link rel="import" href="/Elements/Elements.html" />
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type='text/css'>
+
+    <link href="css/admin.css" rel="stylesheet" />
+</head>
+<body>
+    <template is="auto-binding" id="page">
+        
+        <core-ajax id="ajaxLogin"
+                   url="/admin/login"
+                   params='{"email":"{{email}}", "password":"{{password}}"}'
+                   method="post"
+                   on-core-response="{{HandleLogin}}">
+        </core-ajax>
+        <core-ajax id="ajaxAuth"
+                   url="/admin/checkauthorization"
+                   on-core-response="{{HandleAuth}}">
+        </core-ajax>
+        <core-ajax id="ajaxSite"
+                   auto
+                   url="/admin/site"
+                   handleas="json"
+                   on-core-response="{{HandleSite}}">
+        </core-ajax>
+        <header>
+            <section layout horizontal center>
+                <h1 flex>{{Site.Name}}</h1>
+                <core-icon icon="account-circle"></core-icon>
+                <p>{{Site.User.Name}}</p>
+                <core-icon icon="more-vert"></core-icon>
+            </section>
+            <nav>
+                <template repeat="{{page in Site.Pages}}">
+                    <button on-tap="{{SelectPage}}">{{page.Name}}</button>
+                </template>
+            </nav>
+        </header>
+
+        <core-pages selected="{{SelectedPage}}" valueattr="data-pagename">
+            <template repeat="{{page in Site.Pages}}">
+                <section>
+                    {{page.Name}}
+                </section>
+            </template>
+        </core-pages>
+
+        <section id="login" layout vertical center hidden>
+            <section layout vertical>
+                <h2>login</h2>
+                <label for="email">Email</label>
+                <input type="email" name="email" value="{{email}}" required />
+                <label for="password">Password</label>
+                <input type="password" name="password" value="{{password}}" required />
+                <section layout horizontal center>
+                    <p id="status" flex></p>
+                    <button on-tap="{{Login}}">
+                        <core-icon icon="check"></core-icon>
+                    </button>
+                </section>
+            </section>
+        </section>
+
+    </template>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

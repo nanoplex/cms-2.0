@@ -1,0 +1,22 @@
+﻿<link rel="import" href="/bower_components/polymer/polymer.html"/>
+
+<polymer-element name="el-page" attributes="data">
+    <template>
+        <h2>{{Name}}</h2>
+    </template>
+    <script>
+        Polymer({
+            ready: function () {
+                this.Name = this.data.Name;
+                this.PublishDate = this.data.PublishDate;
+                this.Visible = this.data.Visible;
+                this.Content = this.data.Content;
+            },
+            Name: "Loading..",
+            PublishDate: undefined,
+            Visible: false,
+            Content: [],
+            data: undefined
+        })
+    </script>
+</polymer-element>
