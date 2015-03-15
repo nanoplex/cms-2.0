@@ -1,0 +1,6 @@
+*.csproj
+*.csproj.user
+App_Data/
+bin/
+obj/
+Properties/
