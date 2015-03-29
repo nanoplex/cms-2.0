@@ -1,57 +1,76 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Frontend</title>
+    <title></title>
 
-    <link rel="import" href="/Elements/Elements.html"/>
+    <link rel="import" href="/Elements/Elements.html" />
+    <link rel="import" href="/Components/Components.html" />
 </head>
-    <body>
-        <template is="auto-binding" id="site">
-            
-            <core-ajax id="ajax"
-                       auto
-                       url="/home/site"
-                       params=''
-                       handleas="json"
-                       method="get"
-                       on-core-response="{{HandleSite}}">
-            </core-ajax>
+<body>
+    <template is="auto-binding" id="site">
 
-            <header>
-                <h1>{{Site.Name}}</h1>
-                <nav>
-                    <template repeat="{{page in Site.Pages}}">
-                        <button on-tap="{{SelectPage}}">{{page.Name}}</button>
-                    </template>
-                </nav>
-            </header>
+        <core-ajax id="ajax"
+                   auto
+                   url="/home/site"
+                   handleas="json"
+                   method="get"
+                   on-core-response="{{HandleSite}}">
+        </core-ajax>
 
-            <core-pages id="pages" selected="{{SelectedPage}}" valueattr="data-pagename">
+        <header>
+            <h1>{{Site.Name}}</h1>
+            <nav>
                 <template repeat="{{page in Site.Pages}}">
-                    <section data-pagename="{{page.Name}}">
-                        <el-page data="{{page}}"></el-page>
-                    </section>
+                    <button on-tap="{{SelectPage}}">{{page.Name}}</button>
                 </template>
-            </core-pages>
+            </nav>
+        </header>
 
-        </template>
+        <core-pages id="pages"
+                    selected="{{SelectedPage}}"
+                    valueattr="data-pagename">
+            <section data-pagename="view-loading" layout vertical center>
+                <paper-spinner active style="margin-top: 4em;"></paper-spinner>
+            </section>
 
-        <script>
-            
-            var site = document.getElementById("site");
+            <template repeat="{{page in Site.Pages}}">
 
-            site.ready = function() {
-                this.HandleSite = function(res) {
-                    site.Site = res.detail.response;
-                    console.log(site.Site);
-                    if (site.Site.Pages[0] != null)
-                        site.SelectedPage = site.Site.Pages[0].Name;
-                };
-                this.SelectPage = function(event, a, e) {
-                    site.SelectedPage = e.innerHTML;
-                };
+                <section data-pagename="{{page.Name}}">
+                    <el-page data="{{page}}"></el-page>
+                </section>
+
+            </template>
+
+        </core-pages>
+
+    </template>
+
+    <script>
+
+        var site = document.getElementById("site");
+
+        site.SelectedPage = "view-loading";
+
+        function setTitle() {
+            document.querySelector("title").innerHTML = site.SelectedPage.replace(/^view-/, '') + " - " + site.Site.Name;
+        };
+
+        site.ready = function () {
+            this.HandleSite = function (res) {
+                site.Site = res.detail.response;
+
+                if (site.Site.Pages != null)
+                    site.SelectedPage = site.Site.Pages[0].Name;
+                else
+                    site.SelectedPage = "loading";
+                setTitle();
             };
+            this.SelectPage = function (event, a, e) {
+                site.SelectedPage = e.innerHTML;
+                setTitle();
+            };
+        };
 
-        </script>
-    </body>
+    </script>
+</body>
 </html>

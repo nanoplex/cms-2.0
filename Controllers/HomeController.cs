@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using mvc.Models;
+using cms.Models;
 
-namespace mvc.Controllers
+namespace cms.Controllers
 {
     public class HomeController : Controller
     {
+        public static Site site = new Site(null);
+
+        [HttpGet]
         public JsonResult Site()
         {
-            return Json(new Site(null), JsonRequestBehavior.AllowGet);
+            return Json(site, JsonRequestBehavior.AllowGet);
         }
     }
 }

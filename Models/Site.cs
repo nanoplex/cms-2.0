@@ -6,8 +6,12 @@ using System.Web;
 using mongo;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using cms.Components;
+using System.Reflection;
+using MongoDB.Driver.Builders;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace mvc.Models
+namespace cms.Models
 {
     public class Site
     {
@@ -16,27 +20,35 @@ namespace mvc.Models
         protected Settings Settings { get; set; }
         public List<Page> Pages { get; set; }
 
-        private MongoTable<Site> DbSite = new MongoTable<Site>();
+        public static MongoTable<Site> Db = new MongoTable<Site>();
 
-        public Site()
+        [BsonConstructor]
+        public Site() { }
+
+        public Site(int? CONTRUCTOR_FILLER)
         {
-            
-        }
-
-        public Site(string t)
-        {
-            if (Settings != null)
-            {
-                new FileLog().SetMessages(Settings.LogLevel);
-                if (Settings.Email) new EmailLog().SetMessages(Settings.LogLevel);
-            }
-
             try
             {
-                var site = DbSite.Collection().FindAllAs<Site>().FirstOrDefault();
+                Settings = Settings.Db.Collection().FindOneAs<Settings>();
+
+                if (Settings != null)
+                {
+                    FileLog.Instance.SetMessages(Settings.LogLevel);
+
+                    if (Settings.Email)
+                        EmailLog.Instance.SetMessages(Settings.LogLevel);
+                }
+
+                var site = Db.Collection().FindAllAs<Site>().FirstOrDefault();
+
+                var components = Assembly.GetExecutingAssembly()
+                    .GetTypes()
+                    .Where(t => t.Namespace == "mvc.Components")
+                    .ToList();
+
                 Name = site.Name;
-                if (site.Pages != null)
-                    Pages = site.Pages.Where(p => p.Visibile == true).ToList();
+
+                Pages = Page.Db.Collection().FindAllAs<Page>().ToList();
             }
             catch (NullReferenceException)
             {
@@ -46,7 +58,6 @@ namespace mvc.Models
             {
                 Name = "Server could not connect to database";
             }
-
         }
     }
 

@@ -3,19 +3,28 @@
 <polymer-element name="el-page" attributes="data">
     <template>
         <h2>{{Name}}</h2>
+        <section id="Components"></section>
     </template>
     <script>
         Polymer({
             ready: function () {
+                var str = "";
+
                 this.Name = this.data.Name;
                 this.PublishDate = this.data.PublishDate;
                 this.Visible = this.data.Visible;
-                this.Content = this.data.Content;
+                this.Components = this.data.Components;
+
+                for (var i = 0; i < this.Components.length; i++) {
+                    str += this.Components[i].Frontend
+                }
+
+                this.injectBoundHTML(str, this.$.Components);
             },
             Name: "Loading..",
             PublishDate: undefined,
             Visible: false,
-            Content: [],
+            Components: [],
             data: undefined
         })
     </script>

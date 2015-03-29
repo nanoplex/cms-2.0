@@ -4,69 +4,217 @@
     <title>Admin</title>
 
     <link rel="import" href="/Elements/Elements.html" />
+
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type='text/css'>
 
-    <link href="css/admin.css" rel="stylesheet" />
+    <link href="css/admin.min.css" rel="stylesheet" />
+
+    <script src="/bower_components/webcomponentsjs/webcomponents.min.js" async defer></script>
 </head>
 <body>
+
     <template is="auto-binding" id="page">
-        
-        <core-ajax id="ajaxLogin"
-                   url="/admin/login"
-                   params='{"email":"{{email}}", "password":"{{password}}"}'
-                   method="post"
-                   on-core-response="{{HandleLogin}}">
-        </core-ajax>
-        <core-ajax id="ajaxAuth"
+
+        <core-ajax auto
+                   id="ajaxAuth"
                    url="/admin/checkauthorization"
-                   on-core-response="{{HandleAuth}}">
+                   handleas="text"
+                   on-core-response="{{handleAuth}}">
         </core-ajax>
         <core-ajax id="ajaxSite"
-                   auto
                    url="/admin/site"
                    handleas="json"
-                   on-core-response="{{HandleSite}}">
+                   on-core-response="{{handleSite}}">
         </core-ajax>
-        <header>
-            <section layout horizontal center>
-                <h1 flex>{{Site.Name}}</h1>
-                <core-icon icon="account-circle"></core-icon>
-                <p>{{Site.User.Name}}</p>
-                <core-icon icon="more-vert"></core-icon>
-            </section>
-            <nav>
-                <template repeat="{{page in Site.Pages}}">
-                    <button on-tap="{{SelectPage}}">{{page.Name}}</button>
-                </template>
-            </nav>
-        </header>
+        <core-ajax id="ajaxLogin"
+                   url="/admin/login"
+                   params='{"email":"{{email}}","password":"{{password}}"}'
+                   handleas="text"
+                   method="post"
+                   on-core-response="{{handleLogin}}">
+        </core-ajax>
+        <core-ajax id="ajaxEditPage"
+                   url="/admin/editpage"
+                   handleas="text"
+                   method="post"
+                   on-core-response="{{handleAuth}}">
+        </core-ajax>
+        <core-ajax id="ajaxAddPage"
+                   url="/admin/addpage"
+                   handleas="text"
+                   method="post"
+                   on-core-response="{{handleAuth}}">
+        </core-ajax>
+        <core-ajax id="ajaxDeletePage"
+                   url="/admin/deletepage"
+                   handleas="text"
+                   method="post"
+                   on-core-response="{{handleAuth}}">
+        </core-ajax>
 
-        <core-pages selected="{{SelectedPage}}" valueattr="data-pagename">
-            <template repeat="{{page in Site.Pages}}">
-                <section>
-                    {{page.Name}}
-                </section>
-            </template>
-        </core-pages>
+        <core-drawer-panel forcenarrow="true">
 
-        <section id="login" layout vertical center hidden>
-            <section layout vertical>
-                <h2>login</h2>
-                <label for="email">Email</label>
-                <input type="email" name="email" value="{{email}}" required />
-                <label for="password">Password</label>
-                <input type="password" name="password" value="{{password}}" required />
-                <section layout horizontal center>
-                    <p id="status" flex></p>
-                    <button on-tap="{{Login}}">
-                        <core-icon icon="check"></core-icon>
-                    </button>
-                </section>
-            </section>
+            <core-header-panel drawer>
+                <nav>
+                    <template repeat="{{page in Site.Pages}}">
+
+                        <template if="{{page.Name == SelectedPage}}">
+                            <section class="selected"
+                                     data-id="{{page._id}}"
+                                     data-order="{{page.Order}}"
+                                     layout horizontal center>
+
+                                <p onmousedown="page.startPageSelect('{{page._id}}')"
+                                   onmouseup="page.endPageSelect('{{page._id}}', '{{page.Name}}', {{page.Order}})"
+                                   flex>{{page.Name}}</p>
+                                <button onclick="page.deletePage(page._id)">
+                                    <core-icon icon="close"></core-icon>
+                                </button>
+
+                            </section>
+                        </template>
+
+                        <template if="{{page.Name != SelectedPage}}">
+                            <section data-id="{{page._id}}"
+                                     data-order="{{page.Order}}"
+                                     layout horizontal center>
+
+                                <p onmousedown="page.startPageSelect('{{page._id}}')"
+                                   onmouseup="page.endPageSelect('{{page._id}}', '{{page.Name}}', {{page.Order}})"
+                                   flex>{{page.Name}}</p>
+                                <button onclick="page.deletePage('{{page._id}}')">
+                                    <core-icon icon="close"></core-icon>
+                                </button>
+
+                            </section>
+                        </template>
+
+                    </template>
+                </nav>
+            </core-header-panel>
+
+            <core-header-panel main>
+
+                <header id="header" hidden>
+                    <section layout horizontal center>
+
+                        <core-icon on-tap="{{toggleNav}}" icon="menu">
+                        </core-icon>
+
+                        <h1 flex>{{Site.Name}}</h1>
+
+                        <core-icon icon="account-circle">
+                        </core-icon>
+                        <p>{{Site.User.Name}}</p>
+
+                        <core-icon icon="more-vert">
+                        </core-icon>
+
+                    </section>
+                </header>
+
+                <core-pages selected="{{SelectedPage}}"
+                            valueattr="data-pagename">
+
+                    <!-- unloaded view -->
+                    <section data-pagename="view-unloaded"
+                             layout vertical center>
+                        <paper-spinner active>
+                        </paper-spinner>
+                    </section>
+
+                    <!-- login view -->
+                    <section data-pagename="view-login"
+                             layout vertical center>
+
+                        <h2>Login</h2>
+
+                        <label for="email">Email</label>
+                        <input type="email"
+                               name="email"
+                               value="{{email}}"
+                               required />
+
+                        <label for="password">Password</label>
+                        <input type="password"
+                               name="password"
+                               value="{{password}}"
+                               required />
+
+                        <section layout horizontal center>
+
+                            <p class="status" flex></p>
+                            <button on-tap="{{login}}">
+                                <core-icon icon="check">
+                                </core-icon>
+                            </button>
+
+                        </section>
+
+                    </section>
+
+                    <!-- add page view -->
+                    <section data-pagename="view-add-page"
+                             layout vertical center>
+
+                        <h2>Add Page</h2>
+
+                        <label for="page-name">Name</label>
+                        <input type="text"
+                               name="page-name"
+                               value="{{newPageName}}"
+                               required />
+
+                        <section layout horizontal center>
+
+                            <p class="status" flex></p>
+                            <button on-tap="{{addPage}}">
+                                <core-icon icon="check">
+                                </core-icon>
+                            </button>
+
+                        </section>
+
+                    </section>
+
+                    <!-- page view -->
+                    <template repeat="{{page in Site.Pages}}">
+
+                        <section class="page" data-pagename="{{page.Name}}"
+                                 layout horizontal start>
+                            {{page.Name}}
+                        </section>
+
+                    </template>
+
+                </core-pages>
+
+            </core-header-panel>
+        </core-drawer-panel>
+
+        <section id="add" layout vertical end hidden>
+
+            <article id="addOptions" layout vertical end hidden>
+
+                <button on-tap="{{showAddPage}}" layout horizontal center>
+                    <p>page</p>
+                    <core-icon icon="description">
+                    </core-icon>
+                </button>
+
+                <button on-tap="{{showAddComponent}}" layout horizontal center>
+                    <p>components</p>
+                    <core-icon icon="extension">
+                    </core-icon>
+                </button>
+
+            </article>
+
+            <button on-tap="{{toggleAddOptions}}">+</button>
+
         </section>
-
     </template>
 
-    <script src="js/admin.js"></script>
+    <script src="js/admin.min.js"></script>
 </body>
 </html>

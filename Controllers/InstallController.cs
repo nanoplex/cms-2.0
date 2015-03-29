@@ -1,24 +1,22 @@
 ﻿using mongo;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using mvc.Models;
+using cms.Models;
 using System;
 using System.Linq;
 using System.Web.Mvc;
 
-namespace mvc.Controllers
+namespace cms.Controllers
 {
     public class InstallController : Controller
     {
-
         public string SetUser(string name, string email, string password)
         {
             try
             {
-                var dbUser = new MongoTable<User>();
                 var user = new User();
 
-                if (dbUser.Collection().FindAll().FirstOrDefault() == null)
+                if (cms.Models.User.Db.Collection().FindAll().FirstOrDefault() == null)
                 {
                     var salt = Hash.GetRandomSalt(16);
 
@@ -28,7 +26,7 @@ namespace mvc.Controllers
                     user.Password = Hash.HashPassword(password, salt);
                     user.Salt = salt;
 
-                    dbUser.Add(user);
+                    cms.Models.User.Db.Add(user);
                     return "true";
                 }
                 return "you already created a user";
@@ -40,25 +38,24 @@ namespace mvc.Controllers
         }
 
 
-        public string SetSite(string name, int loglevel, bool email)
+        public string SetSite(string name, int loglevel, bool email = false)
         {
             try
             {
-                var dbSite = new MongoTable<Site>();
-                var dbSettings = new MongoTable<Settings>();
-
                 var site = new Site();
                 var settings = new Settings();
 
                 site.Name = name;
+
                 settings.LogLevel = loglevel;
                 settings.Email = email;
 
-                dbSite.Add(site);
-                dbSettings.Add(settings);
+                Site.Db.Add(site);
+                Settings.Db.Add(settings);
+
                 return "true";
             }
-            catch (MongoConnectionException)
+            catch (MongoConnectionException ex)
             {
                 return "database connection error";
             }

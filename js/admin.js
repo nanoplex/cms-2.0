@@ -1,64 +1,161 @@
 ﻿(function () {
+
     "use strict";
 
-    var page = document.getElementById("page");
+    var page = document.getElementById("page"),
+        loginStatus;
 
-    page.Site = undefined;
-    page.Authed = false;
+    page.SelectedPage = "view-unloaded";
+
+    function setTitle() {
+        var title = document.querySelector("title");
+        page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '') + " - Admin", title);
+    };
 
     page.ready = function () {
-
     };
 
-    page.HandleAuth = function (res) {
+    page.handleAuth = function (res) {
+        res = res.detail.response;
 
-        var auth = JSON.parse(res.detail.response.toLowerCase());
-
-        if (auth) {
-            this.Authed = true;
+        if (res === "True") {
             page.$.ajaxSite.go();
         }
-        else page.$.login.removeAttribute("hidden");
-
+        else if (res === "False") {
+            page.SelectedPage = "view-login";
+            setTitle();
+        }
     };
 
-    page.Login = function () {
+    page.handleLogin = function (res) {
+        res = res.detail.response;
 
-        var email = document.querySelector("input[name=email]"),
-            pass = document.querySelector("input[name=password]");
+        if (res === "true") {
+            page.email = null;
+            page.password = null;
 
-        if (email.validity.valid && pass.validity.valid) {
-            page.$.ajaxLogin.go();
-            page.$.status.innerHTML = "<paper-spinner active></paper-spinner>";
-        } else page.$.status.innerHTML = "you must enter valid email and a password";
-
-    };
-
-    page.HandleLogin = function (res) {
-
-        if (res.detail.response.match(/true/) != null) page.$.ajaxAuth.go();
+            page.$.ajaxAuth.go();
+        }
         else {
-            page.$.status.innerHTML = res.detail.response;
-            page.$.status.removeAttribute("hidden");
+            loginStatus.innerHTML = res;
+        }
+    };
+    page.login = function () {
+        loginStatus = document.querySelector("section[data-pagename=view-login] .status");
+        page.injectBoundHTML("<paper-spinner active><paper-spinner/>", loginStatus);
+
+        page.$.ajaxLogin.go();
+    };
+
+    page.handleSite = function (res) {
+        res = res.detail.response;
+
+        document.querySelector("header").removeAttribute("hidden");
+        document.getElementById("add").removeAttribute("hidden");
+
+        if (res !== null) {
+            page.Site = res;
+            page.SelectedPage = page.Site.Pages[0].Name;
+            setTitle();
+
+            console.log(page.Site);
+        }
+    };
+
+    var click = false,
+        end = false,
+        Delete = false,
+        startPos,
+        pos;
+
+    page.startPageSelect = function (id) {
+        click = false;
+        end = false;
+
+        document.querySelector("core-drawer-panel").setAttribute("disableSwipe", "true");
+
+        setTimeout(function () {
+            if (!click) {
+                var self = document.querySelector("nav section[data-id='" + id + "']");
+
+                startPos = undefined;
+                end = true;
+
+                self.setAttribute("class", "drag");
+
+                window.onmousemove = function (event) {
+                    if (startPos == undefined)
+                        startPos = event.clientY;
+
+                    pos = event.clientY;
+
+                    self.setAttribute("style", "top:" + ((pos - startPos)) + "px");
+                };
+            }
+        }, 500);
+    };
+    page.endPageSelect = function (id, name, order) {
+
+        if (!end) {
+
+
+            page.SelectedPage = name;
+            setTitle();
+
+            click = true;
+        }
+        else {
+            window.onmousemove = undefined;
+
+            var move = pos - startPos,
+                height = document.querySelectorAll("nav section[data-id]")[0].offsetHeight,
+                newOrder = Math.round(order + (move / -height));
+
+            (newOrder > order)
+                ? newOrder = (newOrder + 1)
+                : newOrder = (newOrder - 1);
+
+            page.$.ajaxEditPage.params = '{"id":"' + id + '","name":"' + name + '","order":' + newOrder + '}';
+            page.$.ajaxEditPage.go();
         }
 
+        document.querySelector("core-drawer-panel").setAttribute("disableSwipe", "false");
     };
 
-    page.HandleSite = function (res) {
+    page.deletePage = function (id) {
+        page.$.ajaxDeletePage.params = '{"id":"' + id + '"}';
+        page.$.ajaxDeletePage.go();
+        Delete = false;
+    };
+    page.addPage = function () {
+        var firstNavEl = document.querySelector('nav section:nth-child(4)');
 
-        var site = res.detail.response;
+        console.log(firstNavEl.getAttribute("data-order"));
 
-        if (site.Name == "Site does not exist") window.location.href = "/install.html";
-        else if (!this.Authed) page.$.ajaxAuth.go();
-        else {
-            page.$.login.setAttribute("hidden", "");
-            page.Site = site;
-        }
+        page.$.ajaxAddPage.params = '{"name":"' + page.newPageName + '","order":' + (parseInt(firstNavEl.getAttribute("data-order"), 10) + 1) + '}';
+        page.$.ajaxAddPage.go();
 
+        page.newPageName = null;
+    };
+    page.showAddPage = function () {
+        page.SelectedPage = "view-add-page";
+        setTitle();
     };
 
-    page.SelectPage = function (event, a, e) {
-        page.SelectedPage = e.innerHTML;
+    page.toggleNav = function () {
+        document.querySelector("core-drawer-panel").togglePanel();
     };
 
+    page.toggleAddOptions = function () {
+        if (page.$.addOptions.getAttribute("hidden") == null)
+            page.$.addOptions.setAttribute("hidden", "");
+        else page.$.addOptions.removeAttribute("hidden");
+    };
+
+    page.showAddComponent = function () {
+        page.$.addOptions.setAttribute("hidden", "");
+
+        page.SelectedComponent = "view-add-component";
+        setTitle();
+    };
 })();

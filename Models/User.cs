@@ -8,79 +8,86 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace mvc.Models
+namespace cms.Models
 {
     public class User
     {
         public ObjectId _id { get; set; }
-	    public string Name { get; set; }
-	    public string Email { get; set; }
-	    public string Password { get; set; }
-	    public string Salt { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Salt { get; set; }
+
+        public static MongoTable<User> Db = new MongoTable<User>();
 
         public User()
         {
-            
+
         }
 
-	    public User(string email, string password)
-	    {
-	        var dbUser = new MongoTable<User>();
+        public User(string email, string password)
+        {
+            var dbUser = new MongoTable<User>();
 
-	        var user = dbUser.Collection().FindOneAs<User>();
-	        if (user != null)
-	        {
-	            var hashedPassword = Hash.HashPassword(password, user.Salt);
-	            if (user.Email == email && user.Password == hashedPassword)
-	            {
-	                _id = user._id;
-	                Name = user.Name;
-	                Email = user.Email;
-	                Password = hashedPassword;
-	                Salt = user.Salt;
+            var user = dbUser.Collection().FindOneAs<User>();
+            if (user != null)
+            {
+                var hashedPassword = Hash.HashPassword(password, user.Salt);
+                if (user.Email == email && user.Password == hashedPassword)
+                {
+                    _id = user._id;
+                    Name = user.Name;
+                    Email = user.Email;
+                    Password = hashedPassword;
+                    Salt = user.Salt;
 
-                    if(OnUserAuthorized != null)
-	                    OnUserAuthorized(email, EventArgs.Empty);
+                    if (OnUserAuthorized != null)
+                        OnUserAuthorized(this, EventArgs.Empty);
 
-	                return;
-	            }
-	        }
+                    return;
+                }
+            }
 
             if (OnUserUnauthorized != null)
-	            OnUserUnauthorized(email, EventArgs.Empty);
+                OnUserUnauthorized(email, EventArgs.Empty);
 
             throw new UnauthorizedException("username or password is wrong");
-	    }
+        }
 
-	    public static event EventHandler OnUserAuthorized;
-	    public static event EventHandler OnUserUnauthorized;
+        public static event EventHandler OnUserAuthorized;
+        public static event EventHandler OnUserUnauthorized;
 
 
-	    public void ResetPassword(string password)
-	    {
-		    // TODO
-	    }
+        public void ResetPassword(string password)
+        {
+            // TODO
+        }
+
+        [Serializable]
+        public class UnauthorizedException : Exception
+        {
+            public UnauthorizedException()
+            {
+            }
+
+            public UnauthorizedException(string message)
+                : base(message)
+            {
+            }
+
+            public UnauthorizedException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+
+            protected UnauthorizedException(
+                SerializationInfo info,
+                StreamingContext context)
+                : base(info, context)
+            {
+            }
+        }
     }
 
-    [Serializable]
-    public class UnauthorizedException : Exception
-    {
-        public UnauthorizedException()
-        {
-        }
 
-        public UnauthorizedException(string message) : base(message)
-        {
-        }
-
-        public UnauthorizedException(string message, Exception inner) : base(message, inner)
-        {
-        }
-
-        protected UnauthorizedException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
-    }
 }

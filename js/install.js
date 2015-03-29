@@ -23,7 +23,7 @@
     installer.ShowUser = function() {
 
         this.$.welcome.setAttribute("hidden", "");
-        this.$.newSite.removeAttribute("hidden");
+        this.$.newUser.removeAttribute("hidden");
 
     };
 
