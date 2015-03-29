@@ -5,14 +5,15 @@
     var page = document.getElementById("page"),
         loginStatus;
 
-    page.SelectedPage = "view-unloaded";
+    page.SelectedPage = "view-loading";
 
     function setTitle() {
         var title = document.querySelector("title");
-        page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '') + " - Admin", title);
+        page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '').replace(/-/g,' ') + " - Admin", title);
     };
 
     page.ready = function () {
+        setTitle();
     };
 
     page.handleAuth = function (res) {
@@ -117,6 +118,7 @@
 
             page.$.ajaxEditPage.params = '{"id":"' + id + '","name":"' + name + '","order":' + newOrder + '}';
             page.$.ajaxEditPage.go();
+            page.SelectedPage = "view-loading";
         }
 
         document.querySelector("core-drawer-panel").setAttribute("disableSwipe", "false");
@@ -125,15 +127,25 @@
     page.deletePage = function (id) {
         page.$.ajaxDeletePage.params = '{"id":"' + id + '"}';
         page.$.ajaxDeletePage.go();
+        page.SelectedPage = "view-loading";
         Delete = false;
     };
     page.addPage = function () {
-        var firstNavEl = document.querySelector('nav section:nth-child(4)');
+        var firstNavEl = document.querySelector('nav section:nth-child(4)'),
+            order;
 
-        console.log(firstNavEl.getAttribute("data-order"));
+        if (firstNavEl === null) {
+            firstNavEl = document.querySelector('nav section:nth-child(3)');
+        }
 
-        page.$.ajaxAddPage.params = '{"name":"' + page.newPageName + '","order":' + (parseInt(firstNavEl.getAttribute("data-order"), 10) + 1) + '}';
+        if (firstNavEl != null)
+            order = (parseInt(firstNavEl.getAttribute("data-order"), 10) + 1);
+        else order = 0;
+
+        page.$.ajaxAddPage.params = '{"name":"' + page.newPageName + '","order":' + order + '}';
         page.$.ajaxAddPage.go();
+
+        page.SelectedPage = "view-loading";
 
         page.newPageName = null;
     };
@@ -152,10 +164,41 @@
         else page.$.addOptions.removeAttribute("hidden");
     };
 
-    page.showAddComponent = function () {
+    page.showAddComponentOptions = function () {
         page.$.addOptions.setAttribute("hidden", "");
 
-        page.SelectedComponent = "view-add-component";
-        setTitle();
+        page.$.addComponentOptions.removeAttribute("hidden");
     };
+
+    page.showAddComponent = function (a, b, e) {
+        var elComponent = document.querySelector("section[data-pagename=view-component] el-component"),
+            name = e.getAttribute("data-name"),
+            component,
+            data;
+
+        for (var i in page.Site.Components) {
+            if (page.Site.Components[i].Name === name)
+                component = page.Site.Components[i];
+        }
+
+        data = '{"Type":"' + component.Name + '",';
+
+        for (var i = 0; i < component.Props.length; i++) {
+            var prop = component.Props[i];
+                
+            if (prop.Name != "Type") {
+                data += '"' + prop.Name + '":null,';
+            }
+        }
+
+        data = data.replace(/,$/, '') + "}";
+        data = JSON.parse(data)
+
+        elComponent.data = data;
+        elComponent.pagename = page.SelectedPage;
+
+        page.SelectedPage = "view-component";
+
+        page.$.addComponentOptions.setAttribute("hidden", "");
+    }
 })();

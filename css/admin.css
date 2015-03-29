@@ -10,11 +10,11 @@ core-header-panel[drawer] /deep/ #mainContainer {
     background: white;
 }
 
-paper-spinner /deep/ .circle {
+body /deep/ paper-spinner /deep/ .circle {
     border-color: black;
 }
 
-button {
+body /deep/ button {
     background: transparent;
     border: none;
     outline: none;
@@ -26,7 +26,7 @@ button {
     transition: .3s;
 }
 
-    button:hover {
+    body /deep/ button:hover {
         background: rgba(33, 150, 243, 0.50);
     }
 
@@ -118,23 +118,19 @@ nav {
             border-top: 1px solid black;
         }
 
-section[data-pagename=view-unloaded] {
-    margin-top: 5em;
-}
-
-section[data-pagename] h2,
-section[data-pagename] label,
-section[data-pagename] section,
-section[data-pagename] input {
+h2,
+.btn,
+label,
+input {
     width: 270px;
 }
 
-section[data-pagename] {
-    margin-top: 5em;
+section[data-pagename^=view-] {
     min-height: 60vh;
+    margin-top: 5em;
 }
 
-    section[data-pagename] input {
+    input {
         border: none;
         border-bottom: 1px solid;
         margin-bottom: 1em;
@@ -142,7 +138,7 @@ section[data-pagename] {
         outline: none;
     }
 
-    section[data-pagename] .status {
+    .status {
         height: 32px;
     }
 
@@ -159,6 +155,14 @@ section[data-pagename] {
         padding: 1em;
         color: white;
         align-self: flex-end;
+    }
+
+    #add article button {
+        font-size: .7em;
+    }
+
+    #add #addComponentOptions {
+        margin-bottom: .5em;
     }
 
     #add article button:hover {

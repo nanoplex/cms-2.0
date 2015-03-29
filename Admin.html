@@ -12,7 +12,6 @@
     <script src="/bower_components/webcomponentsjs/webcomponents.min.js" async defer></script>
 </head>
 <body>
-
     <template is="auto-binding" id="page">
 
         <core-ajax auto
@@ -51,6 +50,12 @@
                    method="post"
                    on-core-response="{{handleAuth}}">
         </core-ajax>
+        <core-ajax id="ajaxAddComponent"
+                   url="/admin/addContent"
+                   handleas="text"
+                   method="post"
+                   on-core-response="{{handleAuth}}">
+        </core-ajax>
 
         <core-drawer-panel forcenarrow="true">
 
@@ -67,7 +72,8 @@
                                 <p onmousedown="page.startPageSelect('{{page._id}}')"
                                    onmouseup="page.endPageSelect('{{page._id}}', '{{page.Name}}', {{page.Order}})"
                                    flex>{{page.Name}}</p>
-                                <button onclick="page.deletePage(page._id)">
+
+                                <button onclick="page.deletePage('{{page._id}}')">
                                     <core-icon icon="close"></core-icon>
                                 </button>
 
@@ -82,6 +88,7 @@
                                 <p onmousedown="page.startPageSelect('{{page._id}}')"
                                    onmouseup="page.endPageSelect('{{page._id}}', '{{page.Name}}', {{page.Order}})"
                                    flex>{{page.Name}}</p>
+
                                 <button onclick="page.deletePage('{{page._id}}')">
                                     <core-icon icon="close"></core-icon>
                                 </button>
@@ -116,8 +123,8 @@
                 <core-pages selected="{{SelectedPage}}"
                             valueattr="data-pagename">
 
-                    <!-- unloaded view -->
-                    <section data-pagename="view-unloaded"
+                    <!-- loading view -->
+                    <section data-pagename="view-loading"
                              layout vertical center>
                         <paper-spinner active>
                         </paper-spinner>
@@ -141,7 +148,7 @@
                                value="{{password}}"
                                required />
 
-                        <section layout horizontal center>
+                        <section class="btn" layout horizontal center>
 
                             <p class="status" flex></p>
                             <button on-tap="{{login}}">
@@ -165,7 +172,7 @@
                                value="{{newPageName}}"
                                required />
 
-                        <section layout horizontal center>
+                        <section class="btn" layout horizontal center>
 
                             <p class="status" flex></p>
                             <button on-tap="{{addPage}}">
@@ -177,12 +184,20 @@
 
                     </section>
 
+                    <!-- add component view -->
+                    <section data-pagename="view-component">
+                        <el-component></el-component>
+                    </section>
+
                     <!-- page view -->
                     <template repeat="{{page in Site.Pages}}">
 
                         <section class="page" data-pagename="{{page.Name}}"
-                                 layout horizontal start>
-                            {{page.Name}}
+                                 layout vertical start>
+                            <h3>{{page.Name}}</h3>
+                            <template repeat="{{component in page.Components}}">
+                                <p>{{component.Type}}</p>
+                            </template>
                         </section>
 
                     </template>
@@ -202,11 +217,19 @@
                     </core-icon>
                 </button>
 
-                <button on-tap="{{showAddComponent}}" layout horizontal center>
+                <button on-tap="{{showAddComponentOptions}}" layout horizontal center>
                     <p>components</p>
                     <core-icon icon="extension">
                     </core-icon>
                 </button>
+
+            </article>
+
+            <article id="addComponentOptions" layout vertical end hidden>
+
+                <template repeat="{{component in Site.Components}}">
+                    <button data-name="{{component.Name}}" on-tap="{{showAddComponent}}">{{component.Name}}</button>
+                </template>
 
             </article>
 

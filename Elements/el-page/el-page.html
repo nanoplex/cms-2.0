@@ -1,4 +1,4 @@
-﻿<link rel="import" href="/bower_components/polymer/polymer.html"/>
+﻿<link rel="import" href="/bower_components/polymer/polymer.html" />
 
 <polymer-element name="el-page" attributes="data">
     <template>
@@ -8,18 +8,20 @@
     <script>
         Polymer({
             ready: function () {
-                var str = "";
-
                 this.Name = this.data.Name;
                 this.PublishDate = this.data.PublishDate;
                 this.Visible = this.data.Visible;
                 this.Components = this.data.Components;
 
-                for (var i = 0; i < this.Components.length; i++) {
-                    str += this.Components[i].Frontend
-                }
+                if (this.Components != null) {
+                    var str = "";
 
-                this.injectBoundHTML(str, this.$.Components);
+                    for (var i = 0; i < this.Components.length; i++) {
+                        str += this.Components[i].Frontend
+                    }
+
+                    this.injectBoundHTML(str, this.$.Components);
+                }
             },
             Name: "Loading..",
             PublishDate: undefined,

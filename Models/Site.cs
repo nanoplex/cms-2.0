@@ -48,7 +48,7 @@ namespace cms.Models
 
                 Name = site.Name;
 
-                Pages = Page.Db.Collection().FindAllAs<Page>().ToList();
+                Pages = Page.Db.Collection().FindAllAs<Page>().OrderByDescending(p => p.Order).ToList();
             }
             catch (NullReferenceException)
             {

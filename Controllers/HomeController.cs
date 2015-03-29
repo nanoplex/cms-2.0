@@ -14,6 +14,7 @@ namespace cms.Controllers
         [HttpGet]
         public JsonResult Site()
         {
+            site = new Site(null);
             return Json(site, JsonRequestBehavior.AllowGet);
         }
     }

@@ -52,7 +52,7 @@
         site.SelectedPage = "view-loading";
 
         function setTitle() {
-            document.querySelector("title").innerHTML = site.SelectedPage.replace(/^view-/, '') + " - " + site.Site.Name;
+            document.querySelector("title").innerHTML = site.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - " + site.Site.Name;
         };
 
         site.ready = function () {
