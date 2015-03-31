@@ -1,156 +1,153 @@
-﻿<polymer-element name="el-component" attributes="data pagename" layout vertical center>
+﻿<polymer-element name="el-component" 
+                 attributes="_id Name Props nested" 
+                 layout vertical center>
+
     <template>
+
         <style>
             :host {
                 width: 100%;
             }
 
             h2,
-            .btn,
-            label,
-            input {
-                width: 270px;
-            }
-
-            section[data-pagename^=view-] {
-                min-height: 60vh;
-                margin-top: 5em;
-            }
-
-            input {
-                border: none;
-                border-bottom: 1px solid;
-                margin-bottom: 1em;
-                padding: 1em 0;
-                outline: none;
+            #button {
+                width: 350px;
             }
 
             .status {
                 height: 32px;
             }
-
         </style>
 
-        <h2>{{Type}}</h2>
+        <h2>{{Name}}</h2>
 
-        <template repeat="{{prop in Props}}">
+        <section id="components"
+                 layout vertical center>
 
-            <label for="{{prop.Name}}">{{prop.Name}}</label>
+            <template repeat="{{prop in Props}}">
 
-            <template if="{{prop.Type === 'String'}}">
-                <input type="text" name="{{prop.Name}}" value="{{prop.Value}}" required />
+                <el-property name="{{prop.Name}}"
+                             type="{{prop.Type}}"
+                             value="{{prop.Value}}">
+                </el-property>
+
             </template>
+        </section>
 
-            <template if="{{prop.Type === 'Textbox'}}">
-                <textarea name="{{prop.Name}}" required>{{prop.Value}}</textarea>
-            </template>
+        <section id="button"
+                 layout horizontal center>
 
-            <template if="{{prop.Type === 'Int32'}}">
-                <input type="number" name="{{prop.Name}}" value="{{prop.Value}}" required />
-            </template>
-
-            <template if="{{prop.Type === 'Image'}}">
-                <input type="file" name="{{prop.Name}}" value="{{prop.Value}}" required />
-            </template>
-
-            <!-- lists + textbox in backend -->
-
-        </template>
-
-        <section class="btn" layout horizontal center>
             <p class='status' flex></p>
+
             <button on-tap="{{finish}}">
-                <core-icon icon="check">
-                </core-icon>
+                <core-icon icon="check"></core-icon>
             </button>
+
         </section>
 
     </template>
     <script>
-        var propI = 0;
+        var self;
 
         Polymer({
             ready: function () {
                 if (this.data !== undefined) {
 
-                    this._id = this.data._id;
-                    this.Type = this.data.Type;
-                    this.Frontend = this.data.Frontend;
+                    self = this;
 
-                    propI = 0;
-                    this.Props = [];
+                    console.log("component data", this.data);
 
-                    for (var a in page.Site.Components) {
-
-                        var component = page.Site.Components[a];
-
-                        if (component.Name == this.Type) {
-
-                            for (var b in component.Props) {
-
-                                var prop = component.Props[b];
-
-                                if (prop.Name !== "Type") {
-
-                                    this.Props[propI] = {
-                                        "Name": prop.Name,
-                                        "Type": prop.Type,
-                                        "Value": this.data[prop.Name]
-                                    };
-
-                                    propI++;
-                                }
-                            }
-
-                        }
+                    if (this.nested) {
+                        this.$.button.setAttribute("hidden", "");
                     }
                 }
             },
-            finish: function () {
-                var comp = "{",
-                    images = document.querySelector("section[data-pagename=view-component] el-component").shadowRoot.querySelectorAll("input[type=file]");
 
-                console.log(images);
+            finish: function () {
+
+                if (this._id == undefined) {
+                    this.Add();
+                }
+                else {
+                    this.Edit();
+                }
+
+            },
+
+            Add: function () {
+                var images = document.querySelector("section[data-pagename=view-component] el-component")
+                    .shadowRoot.querySelectorAll("el-property[type=Image]")
+                    .shadowRoot.querySelectorAll("input[type=file]");
+
+                page.$.ajaxAddComponent.body = new FormData();
+                page.$.ajaxAddComponent.contentType = null;
+
+                page.$.ajaxAddComponent.body.append(
+                    "component",
+                    JSON.stringify(this.getComponent()).replace(/"/g, "'"));
+
+                page.$.ajaxAddComponent.body.append(
+                    "componentName",
+                    this.Name);
+
+                page.$.ajaxAddComponent.body.append(
+                    "pageName",
+                    page.LastPage);
+
+                for (var a = 0; a < images.length; a++) {
+                    for (var b = 0; b < images[a].files.length; b++) {
+
+                        var file = images[a].files[b];
+
+                        page.$.ajaxAddComponent.body.append(file.name, file);
+
+                    }
+                }
+
+                page.$.ajaxAddComponent.go();
+            },
+            Edit: function () {
+                // TODO
+            },
+
+            NameChanged: function () {
+                this.ready();
+            },
+
+            getComponent: function () {
+
+                var comp = "{";
 
                 for (var i = 0; i < this.Props.length; i++) {
-                    comp += '"' + this.Props[i].Name + '":"' + this.Props[i].Value + '",';
+                    if (this.Props[i].Type === "Component") {
+
+                        var componentData = this.$.components
+                            .querySelector("el-property[name=" + this.Props[i].Name + "]")
+                            .querySelector("el-component")
+                            .getComponent();
+
+                        comp += '"' + this.Props[i].Name + '":' + JSON.stringify(componentData) + ',';
+
+                    }
+                    else {
+                        comp += '"' + this.Props[i].Name + '":"' + this.Props[i].Value + '",';
+                    }
+
                 }
 
                 comp = JSON.parse(comp.replace(/,$/, '') + "}");
 
-                // add
-                if (this._id == undefined) {
-                    page.$.ajaxAddComponent.body = new FormData();
+                console.log("get component", comp);
 
-                    page.$.ajaxAddComponent.body.append("component", JSON.stringify(comp).replace(/"/g, "'"));
-                    page.$.ajaxAddComponent.body.append("componentName", this.Type);
-                    page.$.ajaxAddComponent.body.append("pageName", this.pagename);
-
-                    for (var a = 0; a < images.length; a++) {
-                        for (var b = 0; b < images[a].files.length; b++) {
-                            var file = images[a].files[b];
-
-                            page.$.ajaxAddComponent.body.append(file.name, file);
-                        }
-                    }
-
-                    page.$.ajaxAddComponent.go();
-                    page.SelectedPage = "view-loading";
-                }
-                    // edit
-                else {
-
-                }
+                return comp;
             },
-            data: undefined,
-            dataChanged: function () {
-                this.ready();
-            },
-            pagename: undefined,
+
             _id: undefined,
-            Type: undefined,
-            Frontend: undefined,
-            Props: []
+            Name: "loading",
+            Props: [],
+            pagename: undefined,
+            nested: false,
+            data: undefined
         })
     </script>
 </polymer-element>

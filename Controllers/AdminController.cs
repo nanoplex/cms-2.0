@@ -2,14 +2,10 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 
 namespace cms.Controllers
@@ -20,45 +16,20 @@ namespace cms.Controllers
         public static AdminSite site = new AdminSite();
 
         [HttpGet]
-        public JsonResult Site()
+        public string Site()
         {
-            try
-            {
-                // list of pages with id as string;
-                var pages = new List<object>();
+            if (site == null)
+                site = new AdminSite();
 
-                site.Pages = GetPages();
+            site.Pages = GetPages();
 
-                site.Pages.ForEach((p) =>
-                {
-                    pages.Add(new
-                    {
-                        _id = p._id.ToString(),
-                        Name = p.Name,
-                        PublishDate = p.PublishDate,
-                        Order = p.Order,
-                        Visibile = p.Visibile,
-                        Components = p.Components
-                    });
-                });
+            var str = BsonExtensionMethods.ToJson<AdminSite>(site);
+            str = Regex.Replace(str, @":\s*ObjectId\(", ":", RegexOptions.Multiline);
+            str = Regex.Replace(str, @":\s*ISODate\(", ":", RegexOptions.Multiline);
+            str = Regex.Replace(str, @"\)\s*,", ",", RegexOptions.Multiline);
+            str = Regex.Replace(str, @"\)\s*}", "}", RegexOptions.Multiline);
 
-                return Auth(Json(new
-                {
-                    Name = site.Name,
-                    Settings = site.Settings,
-                    Pages = pages,
-                    User = site.User,
-                    Components = site.Components
-                },
-                    JsonRequestBehavior.AllowGet));
-            }
-            catch (MongoConnectionException)
-            {
-                return Auth(Json(new
-                {
-                    Name = "Database Connection Error"
-                }, JsonRequestBehavior.AllowGet));
-            }
+            return str;
         }
 
         private List<Page> GetPages()
@@ -73,8 +44,13 @@ namespace cms.Controllers
         public bool CheckAuthorization()
         {
             if (Session["user"] != null)
+            {
                 return true;
-            return false;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         [HttpPost]
@@ -199,42 +175,23 @@ namespace cms.Controllers
 
                 foreach (var com in site.Components)
                 {
-                    var c = Cast(com, new
+                    var c = Cast(com, new Component
                     {
                         Name = "",
-                        Props = new List<dynamic>()
+                        Props = new List<Prop>()
                     });
 
                     if (c.Name == componentName)
                     {
-                        var type = Assembly.GetExecutingAssembly()
-                            .GetTypes()
-                            .Where(t => t.Namespace == "cms.Components")
-                            .Where(comp => comp.Name == componentName)
-                            .FirstOrDefault();
-
-                        var images = new List<string>();
-                        foreach (var prop in c.Props)
-                        {
-                            if (prop.Type == "Image")
-                            {
-                                images.Add(prop.Name);
-                            }
-                        }
-
-                        dynamic obj = JsonConvert.DeserializeObject(component, type);
-                        obj._id = ObjectId.GenerateNewId();
-
-                        for (int i = 0; i < Request.Files.Count; i++)
-                        {
-                            var image = Image.FromStream(Request.Files[i].InputStream);
-                            var path = "\\uploads\\images\\" + obj._id + i + ".jpeg";
-
-                            image.Save(Server.MapPath(path), ImageFormat.Jpeg);
-                        }
 
                         if (page.Components == null)
                             page.Components = new List<object>();
+
+                        dynamic obj = page.parseComponent(
+                            componentName,
+                            c.Props,
+                            component,
+                            Request.Files);
 
                         page.Components.Add(obj);
                     }

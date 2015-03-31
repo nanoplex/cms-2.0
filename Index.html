@@ -51,7 +51,7 @@
 
         site.SelectedPage = "view-loading";
 
-        function setTitle() {
+        function page.setTitle() {
             document.querySelector("title").innerHTML = site.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - " + site.Site.Name;
         };
 
@@ -63,11 +63,11 @@
                     site.SelectedPage = site.Site.Pages[0].Name;
                 else
                     site.SelectedPage = "loading";
-                setTitle();
+                page.setTitle();
             };
             this.SelectPage = function (event, a, e) {
                 site.SelectedPage = e.innerHTML;
-                setTitle();
+                page.setTitle();
             };
         };
 

@@ -11,7 +11,7 @@ core-header-panel[drawer] /deep/ #mainContainer {
 }
 
 body /deep/ paper-spinner /deep/ .circle {
-    border-color: black;
+    border-color: #2196F3;
 }
 
 body /deep/ button {
@@ -121,8 +121,9 @@ nav {
 h2,
 .btn,
 label,
-input {
-    width: 270px;
+input,
+textarea {
+    width: 350px;
 }
 
 section[data-pagename^=view-] {
@@ -130,17 +131,34 @@ section[data-pagename^=view-] {
     margin-top: 5em;
 }
 
-    input {
-        border: none;
-        border-bottom: 1px solid;
-        margin-bottom: 1em;
-        padding: 1em 0;
-        outline: none;
+input, textarea {
+    border: none;
+    border-bottom: 1px solid;
+    margin-bottom: 1em;
+    padding: 1em 0;
+    outline: none;
+    -moz-transition: border-bottom-width .3s, border-bottom-color .5s;
+    -o-transition: border-bottom-width .3s, border-bottom-color .5s;
+    -webkit-transition: border-bottom-width .3s, border-bottom-color .5s;
+    transition: border-bottom-width .3s, border-bottom-color .5s;
+}
+
+    input:focus, textarea:focus {
+        border-bottom-width: 2px;
     }
 
-    .status {
-        height: 32px;
-    }
+        input:focus:invalid, textarea:focus:invalid {
+            border-bottom-color: #F44336;
+        }
+
+textarea {
+    min-height: 50px;
+    max-width: 350px;
+}
+
+.status {
+    height: 32px;
+}
 
 #add {
     position: fixed;
@@ -175,3 +193,36 @@ section[data-pagename^=view-] {
         height: 1.5em;
         margin-left: .5em;
     }
+
+#status {
+    position: fixed;
+    bottom: 2em;
+    left: 2em;
+    background: rgba(0,0,0,.75);
+    color: white;
+    padding: .5em 1.5em;
+    border-radius: 999px;
+    -moz-transition: left .3s;
+    -o-transition: left .3s;
+    -webkit-transition: left .3s;
+    transition: left .3s;
+}
+
+    #status p {
+        margin: 0 1em 0 0;
+        line-height: 0;
+    }
+
+    #status button {
+        color: #2196F3;
+        font-size: 1em;
+        padding: .5em 0;
+    }
+
+        #status button:hover {
+            background: none;
+        }
+
+#status.hidden {
+    left: -200%;
+}

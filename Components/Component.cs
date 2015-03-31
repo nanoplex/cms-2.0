@@ -1,4 +1,6 @@
 ﻿using MongoDB.Bson;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +12,6 @@ namespace cms.Components
     {
         [unused]
         public ObjectId _id { get; set; }
-        public string Type
-        {
-            get
-            {
-                return this.GetType().Name;
-            }
-        }
 
         [unused]
         public abstract string Frontend { get; }

@@ -16,7 +16,7 @@ namespace cms.Models
     {
         public User User { get; set; }
         public Settings Settings { get; set; }
-        public List<object> Components { get; set; }
+        public List<Component> Components { get; set; }
 
         public static MongoTable<Site> Db = new MongoTable<Site>();
 
@@ -26,6 +26,7 @@ namespace cms.Models
             {
                 var adminSite = Db.Collection().FindOneAs<Site>();
 
+                _id = adminSite._id;
                 Name = adminSite.Name;
 
                 Pages = Page.Db.Collection().FindAllAs<Page>()
@@ -69,52 +70,105 @@ namespace cms.Models
                 })
                 .ToList();
 
-            Components = new List<object>();
+            Components = new List<Component>();
 
             foreach (var component in components)
             {
-                var properties = component.GetProperties();
-                var selected = new List<object>();
-
-                foreach (var prop in properties)
-                {
-                    var attrs = prop.GetCustomAttributes();
-                    var used = true;
-                    var image = false;
-                    foreach (var attr in attrs)
-                    {
-                        if (attr.GetType().Name == "unusedAttribute")
-                            used = false;
-
-                        if (attr.GetType().Name == "imageAttribute")
-                            image = true;
-                    }
-
-                    var type = prop.PropertyType;
-                    var name = prop.Name;
-
-                    if (used)
-                    {
-                        if (image)
-                            selected.Add(new
-                            {
-                                Name = name,
-                                Type = "Image"
-                            });
-                        else
-                            selected.Add(new
-                            {
-                                Name = name,
-                                Type = type.Name
-                            });
-                    }
-                }
-                Components.Add(new 
-                {
-                    Name = component.Name,
-                    Props = selected 
-                });
+                Components.Add(GetComponent(component, components));
             }
         }
+
+        private Component GetComponent(Type component, List<Type> components)
+        {
+            var properties = component.GetProperties();
+            var selectedProperties = new List<Prop>();
+
+            foreach (var prop in properties)
+            {
+                var attrs = prop.GetCustomAttributes();
+
+                var used = true;
+                var image = false;
+                var textbox = false;
+                var typeComponent = false;
+
+                foreach (var attr in attrs)
+                {
+                    var attrName = attr.GetType().Name;
+
+                    if (attrName == "unusedAttribute")
+                        used = false;
+
+                    if (attrName == "imageAttribute")
+                        image = true;
+
+                    if (attrName == "textboxAttribute")
+                        textbox = true;
+                }
+
+                if (used)
+                {
+
+                    var name = prop.Name;
+                    var type = prop.PropertyType.Name;
+                    Component value = new Component();
+
+                    foreach (var c in components)
+                    {
+                        if (type == c.Name)
+                            typeComponent = true;
+                    }
+
+                    if (image)
+                        type = "Image";
+                    else if (textbox)
+                        type = "Textbox";
+                    else if (typeComponent)
+                    {
+                        type = "Component";
+                        value = GetComponent(prop.PropertyType, components);
+                    }
+
+                    if (type == "Component")
+                    {
+                        selectedProperties.Add(new Prop
+                        {
+                            Name = name,
+                            Type = type,
+                            Value = value
+                        });
+                    }
+                    else
+                    {
+                        selectedProperties.Add(new Prop
+                        {
+                            Name = name,
+                            Type = type,
+                            Value = null
+                        });
+                    }
+
+                }
+            }
+
+            return new Component
+            {
+                Name = component.Name,
+                Props = selectedProperties
+            };
+        }
+    }
+    public class Component
+    {
+        public string Name { get; set; }
+        public List<Prop> Props { get; set; }
+
+
+    }
+    public class Prop
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public Component Value { get; set; }
     }
 }

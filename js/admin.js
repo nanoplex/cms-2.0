@@ -7,24 +7,22 @@
 
     page.SelectedPage = "view-loading";
 
-    function setTitle() {
-        var title = document.querySelector("title");
-        page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '').replace(/-/g,' ') + " - Admin", title);
-    };
 
     page.ready = function () {
-        setTitle();
+        page.setTitle();
     };
 
     page.handleAuth = function (res) {
         res = res.detail.response;
+
+        page.SelectedPage = "view-loading";
 
         if (res === "True") {
             page.$.ajaxSite.go();
         }
         else if (res === "False") {
             page.SelectedPage = "view-login";
-            setTitle();
+            page.setTitle();
         }
     };
 
@@ -41,12 +39,7 @@
             loginStatus.innerHTML = res;
         }
     };
-    page.login = function () {
-        loginStatus = document.querySelector("section[data-pagename=view-login] .status");
-        page.injectBoundHTML("<paper-spinner active><paper-spinner/>", loginStatus);
-
-        page.$.ajaxLogin.go();
-    };
+    
 
     page.handleSite = function (res) {
         res = res.detail.response;
@@ -56,10 +49,14 @@
 
         if (res !== null) {
             page.Site = res;
-            page.SelectedPage = page.Site.Pages[0].Name;
-            setTitle();
 
-            console.log(page.Site);
+            page.SelectedPage = page.Site.Pages[0].Name;
+            if (page.LastPage != undefined)
+                page.SelectedPage = page.LastPage;
+            
+            page.setTitle();
+
+            console.log("site",page.Site);
         }
     };
 
@@ -68,7 +65,6 @@
         Delete = false,
         startPos,
         pos;
-
     page.startPageSelect = function (id) {
         click = false;
         end = false;
@@ -99,9 +95,9 @@
 
         if (!end) {
 
-
+            page.LastPage = name;
             page.SelectedPage = name;
-            setTitle();
+            page.setTitle();
 
             click = true;
         }
@@ -118,16 +114,21 @@
 
             page.$.ajaxEditPage.params = '{"id":"' + id + '","name":"' + name + '","order":' + newOrder + '}';
             page.$.ajaxEditPage.go();
-            page.SelectedPage = "view-loading";
         }
 
         document.querySelector("core-drawer-panel").setAttribute("disableSwipe", "false");
     };
 
+    page.login = function () {
+        loginStatus = document.querySelector("section[data-pagename=view-login] .status");
+        page.injectBoundHTML("<paper-spinner active><paper-spinner/>", loginStatus);
+
+        page.$.ajaxLogin.go();
+    };
+
     page.deletePage = function (id) {
         page.$.ajaxDeletePage.params = '{"id":"' + id + '"}';
         page.$.ajaxDeletePage.go();
-        page.SelectedPage = "view-loading";
         Delete = false;
     };
     page.addPage = function () {
@@ -143,16 +144,47 @@
         else order = 0;
 
         page.$.ajaxAddPage.params = '{"name":"' + page.newPageName + '","order":' + order + '}';
-        page.$.ajaxAddPage.go();
+        
+        page.status(
+            "page added",
+            function () { page.$.ajaxAddPage.go() });
 
-        page.SelectedPage = "view-loading";
-
+        page.LastPage = undefined;
         page.newPageName = null;
     };
-    page.showAddPage = function () {
-        page.SelectedPage = "view-add-page";
-        setTitle();
+
+    page.setTitle = function () {
+        var title = document.querySelector("title");
+        page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - Admin", title);
     };
+
+    var call = true;
+    page.status = function (msg, callback) {
+        var status = document.getElementById("status"),
+            message = status.querySelector("p"),
+            btn = status.querySelector("button");
+
+        page.SelectedPage = page.LastPage;
+
+        message.innerHTML = msg;
+
+        if (callback !== undefined)
+            btn.onclick = function () {
+                call = false;
+                status.setAttribute("hidden", "");
+            };
+        else
+            btn.setAttribute("hidden", "");
+
+        status.removeAttribute("class");
+
+        setTimeout(function () {
+            if (call) {
+                callback();
+                status.setAttribute("hidden", "");
+            }
+        }, 5000);
+    }
 
     page.toggleNav = function () {
         document.querySelector("core-drawer-panel").togglePanel();
@@ -162,6 +194,11 @@
         if (page.$.addOptions.getAttribute("hidden") == null)
             page.$.addOptions.setAttribute("hidden", "");
         else page.$.addOptions.removeAttribute("hidden");
+    };
+
+    page.showAddPage = function () {
+        page.SelectedPage = "view-add-page";
+        page.setTitle();
     };
 
     page.showAddComponentOptions = function () {
@@ -180,25 +217,12 @@
             if (page.Site.Components[i].Name === name)
                 component = page.Site.Components[i];
         }
+        console.log("data",component);
 
-        data = '{"Type":"' + component.Name + '",';
-
-        for (var i = 0; i < component.Props.length; i++) {
-            var prop = component.Props[i];
-                
-            if (prop.Name != "Type") {
-                data += '"' + prop.Name + '":null,';
-            }
-        }
-
-        data = data.replace(/,$/, '') + "}";
-        data = JSON.parse(data)
-
-        elComponent.data = data;
-        elComponent.pagename = page.SelectedPage;
+        elComponent.Name = component.Name;
+        elComponent.Props = component.Props;
 
         page.SelectedPage = "view-component";
-
         page.$.addComponentOptions.setAttribute("hidden", "");
     }
 })();

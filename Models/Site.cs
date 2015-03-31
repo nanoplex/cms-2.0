@@ -46,6 +46,7 @@ namespace cms.Models
                     .Where(t => t.Namespace == "mvc.Components")
                     .ToList();
 
+                _id = site._id;
                 Name = site.Name;
 
                 Pages = Page.Db.Collection().FindAllAs<Page>().OrderByDescending(p => p.Order).ToList();

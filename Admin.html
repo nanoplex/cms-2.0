@@ -1,18 +1,29 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+
     <title>Admin</title>
 
-    <link rel="import" href="/Elements/Elements.html" />
+    <link rel="import" 
+          href="/Elements/Elements.html" />
 
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' 
+          rel='stylesheet' 
+          type='text/css'>
 
-    <link href="css/admin.min.css" rel="stylesheet" />
+    <link href="css/admin.min.css" 
+          rel="stylesheet" />
 
-    <script src="/bower_components/webcomponentsjs/webcomponents.min.js" async defer></script>
+    <script src="/bower_components/webcomponentsjs/webcomponents.min.js" 
+            async 
+            defer>
+    </script>
+
 </head>
 <body>
     <template is="auto-binding" id="page">
+
+        <!-- #region ajax -->
 
         <core-ajax auto
                    id="ajaxAuth"
@@ -20,11 +31,13 @@
                    handleas="text"
                    on-core-response="{{handleAuth}}">
         </core-ajax>
+
         <core-ajax id="ajaxSite"
                    url="/admin/site"
                    handleas="json"
                    on-core-response="{{handleSite}}">
         </core-ajax>
+
         <core-ajax id="ajaxLogin"
                    url="/admin/login"
                    params='{"email":"{{email}}","password":"{{password}}"}'
@@ -32,12 +45,14 @@
                    method="post"
                    on-core-response="{{handleLogin}}">
         </core-ajax>
+
         <core-ajax id="ajaxEditPage"
                    url="/admin/editpage"
                    handleas="text"
                    method="post"
                    on-core-response="{{handleAuth}}">
         </core-ajax>
+
         <core-ajax id="ajaxAddPage"
                    url="/admin/addpage"
                    handleas="text"
@@ -50,12 +65,15 @@
                    method="post"
                    on-core-response="{{handleAuth}}">
         </core-ajax>
+
         <core-ajax id="ajaxAddComponent"
                    url="/admin/addContent"
                    handleas="text"
                    method="post"
                    on-core-response="{{handleAuth}}">
         </core-ajax>
+
+        <!-- #endregion -->
 
         <core-drawer-panel forcenarrow="true">
 
@@ -71,7 +89,9 @@
 
                                 <p onmousedown="page.startPageSelect('{{page._id}}')"
                                    onmouseup="page.endPageSelect('{{page._id}}', '{{page.Name}}', {{page.Order}})"
-                                   flex>{{page.Name}}</p>
+                                   flex>
+                                    {{page.Name}}
+                                </p>
 
                                 <button onclick="page.deletePage('{{page._id}}')">
                                     <core-icon icon="close"></core-icon>
@@ -87,7 +107,9 @@
 
                                 <p onmousedown="page.startPageSelect('{{page._id}}')"
                                    onmouseup="page.endPageSelect('{{page._id}}', '{{page.Name}}', {{page.Order}})"
-                                   flex>{{page.Name}}</p>
+                                   flex>
+                                    {{page.Name}}
+                                </p>
 
                                 <button onclick="page.deletePage('{{page._id}}')">
                                     <core-icon icon="close"></core-icon>
@@ -105,17 +127,16 @@
                 <header id="header" hidden>
                     <section layout horizontal center>
 
-                        <core-icon on-tap="{{toggleNav}}" icon="menu">
+                        <core-icon on-tap="{{toggleNav}}" 
+                                   icon="menu">
                         </core-icon>
 
                         <h1 flex>{{Site.Name}}</h1>
 
-                        <core-icon icon="account-circle">
-                        </core-icon>
+                        <core-icon icon="account-circle"></core-icon>
                         <p>{{Site.User.Name}}</p>
 
-                        <core-icon icon="more-vert">
-                        </core-icon>
+                        <core-icon icon="more-vert"></core-icon>
 
                     </section>
                 </header>
@@ -126,8 +147,10 @@
                     <!-- loading view -->
                     <section data-pagename="view-loading"
                              layout vertical center>
+
                         <paper-spinner active>
                         </paper-spinner>
+
                     </section>
 
                     <!-- login view -->
@@ -136,24 +159,31 @@
 
                         <h2>Login</h2>
 
-                        <label for="email">Email</label>
+                        <label for="email">
+                            Email
+                        </label>
+
                         <input type="email"
                                name="email"
                                value="{{email}}"
                                required />
 
-                        <label for="password">Password</label>
+                        <label for="password">
+                            Password
+                        </label>
+
                         <input type="password"
                                name="password"
                                value="{{password}}"
                                required />
 
-                        <section class="btn" layout horizontal center>
+                        <section class="btn" 
+                                 layout horizontal center>
 
                             <p class="status" flex></p>
+
                             <button on-tap="{{login}}">
-                                <core-icon icon="check">
-                                </core-icon>
+                                <core-icon icon="check"></core-icon>
                             </button>
 
                         </section>
@@ -172,12 +202,13 @@
                                value="{{newPageName}}"
                                required />
 
-                        <section class="btn" layout horizontal center>
+                        <section class="btn" 
+                                 layout horizontal center>
 
                             <p class="status" flex></p>
+
                             <button on-tap="{{addPage}}">
-                                <core-icon icon="check">
-                                </core-icon>
+                                <core-icon icon="check"></core-icon>
                             </button>
 
                         </section>
@@ -186,7 +217,9 @@
 
                     <!-- add component view -->
                     <section data-pagename="view-component">
+
                         <el-component></el-component>
+
                     </section>
 
                     <!-- page view -->
@@ -194,10 +227,15 @@
 
                         <section class="page" data-pagename="{{page.Name}}"
                                  layout vertical start>
+
                             <h3>{{page.Name}}</h3>
+
                             <template repeat="{{component in page.Components}}">
-                                <p>{{component.Type}}</p>
+
+                                <p>{{component._t}}</p>
+
                             </template>
+
                         </section>
 
                     </template>
@@ -207,28 +245,44 @@
             </core-header-panel>
         </core-drawer-panel>
 
-        <section id="add" layout vertical end hidden>
+        <section id="add" 
+                 layout vertical end hidden>
 
-            <article id="addOptions" layout vertical end hidden>
+            <article id="addOptions" 
+                     layout vertical end hidden>
 
-                <button on-tap="{{showAddPage}}" layout horizontal center>
+                <button on-tap="{{showAddPage}}" 
+                        layout horizontal center>
+
                     <p>page</p>
+
                     <core-icon icon="description">
                     </core-icon>
+
                 </button>
 
-                <button on-tap="{{showAddComponentOptions}}" layout horizontal center>
+                <button on-tap="{{showAddComponentOptions}}" 
+                        layout horizontal center>
+
                     <p>components</p>
+
                     <core-icon icon="extension">
                     </core-icon>
+
                 </button>
 
             </article>
 
-            <article id="addComponentOptions" layout vertical end hidden>
+            <article id="addComponentOptions" 
+                     layout vertical end hidden>
 
                 <template repeat="{{component in Site.Components}}">
-                    <button data-name="{{component.Name}}" on-tap="{{showAddComponent}}">{{component.Name}}</button>
+
+                    <button data-name="{{component.Name}}"
+                            on-tap="{{showAddComponent}}">
+                        {{component.Name}}
+                    </button>
+
                 </template>
 
             </article>
@@ -236,6 +290,16 @@
             <button on-tap="{{toggleAddOptions}}">+</button>
 
         </section>
+
+        <section id="status" class="hidden" 
+                 layout horizontal center>
+
+            <p></p>
+
+            <button>UNDO</button>
+
+        </section>
+
     </template>
 
     <script src="js/admin.min.js"></script>

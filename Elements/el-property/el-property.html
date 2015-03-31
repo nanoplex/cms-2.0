@@ -1,0 +1,123 @@
+﻿<polymer-element name="el-property"
+                 attributes="Name Type Value" layout vertical center>
+    <template>
+
+        <!-- TODO validation -->
+        <!-- TODO lists -->
+
+        <style>
+
+            label,
+            input,
+            textarea {
+                width: 350px;
+            }
+
+            section[data-pagename^=view-] {
+                min-height: 60vh;
+                margin-top: 5em;
+            }
+
+            input, textarea {
+                border: none;
+                border-bottom: 1px solid;
+                margin-bottom: 1em;
+                padding: 1em 0;
+                outline: none;
+                -moz-transition: border-bottom-width .3s, border-bottom-color .5s;
+                -o-transition: border-bottom-width .3s, border-bottom-color .5s;
+                -webkit-transition: border-bottom-width .3s, border-bottom-color .5s;
+                transition: border-bottom-width .3s, border-bottom-color .5s;
+            }
+
+                input:focus, textarea:focus {
+                    border-bottom-width: 2px;
+                }
+
+                    input:focus:invalid, textarea:focus:invalid {
+                        border-bottom-color: #F44336;
+                    }
+
+            textarea {
+                min-height: 50px;
+                max-width: 350px;
+            }
+
+        </style>
+
+        <!-- #region types -->
+
+
+
+        <template if="{{Type !== 'Component'}}">
+
+            <label for="{{Name}}">{{Name}}</label>
+
+        </template>
+
+        <template if="{{Type === 'String'}}">
+
+            <input type="text"
+                   name="{{Name}}"
+                   value="{{Value}}"
+                   required />
+
+        </template>
+
+        <template if="{{Type === 'Textbox'}}">
+
+            <textarea name="{{Name}}" required>{{Value}}</textarea>
+
+        </template>
+
+        <template if="{{Type === 'Int32'}}">
+
+            <input type="number"
+                   name="{{Name}}"
+                   value="{{Value}}"
+                   required />
+
+        </template>
+
+        <template if="{{Type === 'Image'}}">
+
+            <input type="file"
+                   name="{{Name}}"
+                   value="{{Value}}"
+                   required />
+
+        </template>
+
+        <template if="{{Type === 'Boolean'}}">
+
+            <input type="checkbox"
+                   name="{{Name}}"
+                   checked="{{Value}}" />
+
+        </template>
+
+        <template if="{{Type === 'Component'}}">
+
+            <el-component name="{{Name}}"
+                          data="{{Value}}"
+                          nested="true">
+            </el-component>
+
+        </template>
+
+        <!-- #endregion -->
+
+    </template>
+
+    <script>
+        Polymer({
+            ready: function () {
+
+            },
+            Name: "loading",
+            Type: undefined,
+            Value: undefined
+        })
+    </script>
+
+</polymer-element>
