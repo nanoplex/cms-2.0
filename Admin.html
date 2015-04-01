@@ -194,8 +194,13 @@
                     <section data-pagename="view-add-page"
                              layout vertical center>
 
-                        <h2>Add Page</h2>
-
+                        <section layout horizontal justified>
+                            <h2>Add Page</h2>
+                            <button on-tap="{{home}}">
+                                <core-icon icon="close"></core-icon>
+                            </button>
+                        </section>
+                        
                         <label for="page-name">Name</label>
                         <input type="text"
                                name="page-name"

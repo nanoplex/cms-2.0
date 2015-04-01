@@ -38,7 +38,7 @@ namespace cms.Models
             var images = new List<string>();
             foreach (var prop in props)
             {
-                if (prop.Type == "Image")
+                if (prop.Name == "Image")
                 {
                     images.Add(prop.Name);
                 }

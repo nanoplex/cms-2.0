@@ -1,5 +1,5 @@
-﻿<polymer-element name="el-component" 
-                 attributes="_id Name Props nested" 
+﻿<polymer-element name="el-component"
+                 attributes="_id Name Props nested"
                  layout vertical center>
 
     <template>
@@ -9,8 +9,11 @@
                 width: 100%;
             }
 
-            h2,
-            #button {
+            h2 {
+                width: 100%;
+            }
+
+            #button, section {
                 width: 350px;
             }
 
@@ -19,7 +22,12 @@
             }
         </style>
 
-        <h2>{{Name}}</h2>
+        <section layout horizontal center>
+            <h2 flex>{{Name}}</h2>
+            <button on-tap="{{close}}">
+                <core-icon icon="close"></core-icon>
+            </button>
+        </section>
 
         <section id="components"
                  layout vertical center>
@@ -51,11 +59,12 @@
 
         Polymer({
             ready: function () {
-                if (this.data !== undefined) {
+                if (this.Name !== undefined) {
 
                     self = this;
 
-                    console.log("component data", this.data);
+                    console.log("component data", this.name);
+                    console.log("component data", this.Props);
 
                     if (this.nested) {
                         this.$.button.setAttribute("hidden", "");
@@ -72,12 +81,25 @@
                     this.Edit();
                 }
 
+                this.Props = null;
+                this.Name = null;
+            },
+            close: function () {
+                page.SelectedPage = page.LastPage;
+
+                this.Props = null;
+                this.Name = null;
             },
 
             Add: function () {
-                var images = document.querySelector("section[data-pagename=view-component] el-component")
-                    .shadowRoot.querySelectorAll("el-property[type=Image]")
-                    .shadowRoot.querySelectorAll("input[type=file]");
+                var images = [],
+                    imgI = 0,
+                    properties = document.querySelector("section[data-pagename=view-component] el-component").shadowRoot.querySelectorAll("el-property");
+
+                for (var i = 0; i < properties.length; i++) {
+                    images[imgI] = properties[i].shadowRoot.querySelector("input[type=file]");
+                    imgI++;
+                }
 
                 page.$.ajaxAddComponent.body = new FormData();
                 page.$.ajaxAddComponent.contentType = null;
@@ -94,13 +116,16 @@
                     "pageName",
                     page.LastPage);
 
+                console.log(images);
                 for (var a = 0; a < images.length; a++) {
-                    for (var b = 0; b < images[a].files.length; b++) {
+                    if (images[a] != null) {
+                        for (var b = 0; b < images[a].files.length; b++) {
 
-                        var file = images[a].files[b];
+                            var file = images[a].files[b];
 
-                        page.$.ajaxAddComponent.body.append(file.name, file);
+                            page.$.ajaxAddComponent.body.append(file.name, file);
 
+                        }
                     }
                 }
 
@@ -108,10 +133,6 @@
             },
             Edit: function () {
                 // TODO
-            },
-
-            NameChanged: function () {
-                this.ready();
             },
 
             getComponent: function () {
@@ -128,6 +149,18 @@
 
                         comp += '"' + this.Props[i].Name + '":' + JSON.stringify(componentData) + ',';
 
+                    }
+                    else if (this.Props[i].Type.match(/^List\s*/) != null) {
+                        comp += '"' + this.Props[i].Name + '":[';
+
+                        var values = this.Props[i].Value;
+
+                        for (var a = 0; a < values.length; a++) {
+                            comp += '"' + values[a] + '",';
+                        }
+                        comp = comp.replace(/,$/, '');
+
+                        comp += '],';
                     }
                     else {
                         comp += '"' + this.Props[i].Name + '":"' + this.Props[i].Value + '",';

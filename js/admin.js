@@ -39,7 +39,7 @@
             loginStatus.innerHTML = res;
         }
     };
-    
+
 
     page.handleSite = function (res) {
         res = res.detail.response;
@@ -53,10 +53,10 @@
             page.SelectedPage = page.Site.Pages[0].Name;
             if (page.LastPage != undefined)
                 page.SelectedPage = page.LastPage;
-            
+
             page.setTitle();
 
-            console.log("site",page.Site);
+            console.log("site", page.Site);
         }
     };
 
@@ -144,7 +144,7 @@
         else order = 0;
 
         page.$.ajaxAddPage.params = '{"name":"' + page.newPageName + '","order":' + order + '}';
-        
+
         page.status(
             "page added",
             function () { page.$.ajaxAddPage.go() });
@@ -156,6 +156,9 @@
     page.setTitle = function () {
         var title = document.querySelector("title");
         page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - Admin", title);
+    };
+    page.home = function () {
+        page.SelectedPage = page.LastPage;
     };
 
     var call = true;
@@ -191,12 +194,17 @@
     };
 
     page.toggleAddOptions = function () {
-        if (page.$.addOptions.getAttribute("hidden") == null)
+        if (page.$.addOptions.getAttribute("hidden") == null) {
             page.$.addOptions.setAttribute("hidden", "");
-        else page.$.addOptions.removeAttribute("hidden");
+        }
+        else {
+            page.$.addOptions.removeAttribute("hidden");
+            page.$.addComponentOptions.setAttribute("hidden", "");
+        }
     };
 
     page.showAddPage = function () {
+        page.LastPage = page.SelectedPage;
         page.SelectedPage = "view-add-page";
         page.setTitle();
     };
@@ -217,12 +225,14 @@
             if (page.Site.Components[i].Name === name)
                 component = page.Site.Components[i];
         }
-        console.log("data",component);
+        console.log("data", component);
 
         elComponent.Name = component.Name;
         elComponent.Props = component.Props;
 
+        page.LastPage = page.SelectedPage;
         page.SelectedPage = "view-component";
+
         page.$.addComponentOptions.setAttribute("hidden", "");
     }
 })();

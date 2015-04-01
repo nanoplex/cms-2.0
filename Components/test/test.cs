@@ -15,6 +15,13 @@ namespace cms.Components
         [image]
         public string Image { get; set; }
 
+        public List<string> stringList { get; set; }
+        public List<int> intList { get; set; }
+
+        public text TextComponent { get; set; }
+
+        public List<text> ListTextComponent { get; set; }
+
         [unused]
         public string Internal { get; set; }
 

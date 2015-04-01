@@ -33,6 +33,7 @@ namespace mongo
 
                     BsonClassMap.RegisterClassMap<text>(cm => cm.AutoMap());
                     BsonClassMap.RegisterClassMap<image>(cm => cm.AutoMap());
+                    BsonClassMap.RegisterClassMap<test>(cm => cm.AutoMap());
 
                     string connectionString = (_Username != null && _Password != null)
                         ? "mongodb://" + _Username + ":" + _Password + "@" + _Host + "/" + _Database

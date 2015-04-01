@@ -26,6 +26,7 @@ namespace cms.Controllers
             var str = BsonExtensionMethods.ToJson<AdminSite>(site);
             str = Regex.Replace(str, @":\s*ObjectId\(", ":", RegexOptions.Multiline);
             str = Regex.Replace(str, @":\s*ISODate\(", ":", RegexOptions.Multiline);
+            str = Regex.Replace(str, @"System.String\[", "[", RegexOptions.Multiline);
             str = Regex.Replace(str, @"\)\s*,", ",", RegexOptions.Multiline);
             str = Regex.Replace(str, @"\)\s*}", "}", RegexOptions.Multiline);
 
@@ -49,6 +50,7 @@ namespace cms.Controllers
             }
             else
             {
+                site = null;
                 return false;
             }
         }

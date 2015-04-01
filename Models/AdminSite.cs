@@ -111,7 +111,13 @@ namespace cms.Models
 
                     var name = prop.Name;
                     var type = prop.PropertyType.Name;
-                    Component value = new Component();
+                    object value = null;
+
+                    if (type == "List`1")
+                    {
+                        type = "List " + prop.PropertyType.GenericTypeArguments[0].Name;
+                        value = new string[]{};
+                    }
 
                     foreach (var c in components)
                     {
@@ -120,34 +126,25 @@ namespace cms.Models
                     }
 
                     if (image)
+                    {
                         type = "Image";
+                    }
                     else if (textbox)
+                    {
                         type = "Textbox";
+                    }
                     else if (typeComponent)
                     {
                         type = "Component";
                         value = GetComponent(prop.PropertyType, components);
                     }
 
-                    if (type == "Component")
+                    selectedProperties.Add(new Prop
                     {
-                        selectedProperties.Add(new Prop
-                        {
-                            Name = name,
-                            Type = type,
-                            Value = value
-                        });
-                    }
-                    else
-                    {
-                        selectedProperties.Add(new Prop
-                        {
-                            Name = name,
-                            Type = type,
-                            Value = null
-                        });
-                    }
-
+                        Name = name,
+                        Type = type,
+                        Value = value
+                    });
                 }
             }
 
@@ -162,13 +159,11 @@ namespace cms.Models
     {
         public string Name { get; set; }
         public List<Prop> Props { get; set; }
-
-
     }
     public class Prop
     {
         public string Name { get; set; }
         public string Type { get; set; }
-        public Component Value { get; set; }
+        public object Value { get; set; }
     }
 }

@@ -3,10 +3,8 @@
     <template>
 
         <!-- TODO validation -->
-        <!-- TODO lists -->
 
         <style>
-
             label,
             input,
             textarea {
@@ -43,17 +41,42 @@
                 max-width: 350px;
             }
 
+            #listItems section {
+                width: 350px;
+            }
+
+            #listItems /deep/ button:hover {
+                background: transparent !important;
+            }
+
+            #add section {
+                width: 350px;
+            }
+
+            #add article {
+                padding: 1em 0;
+                margin: 1em 0;
+                border-top: 1px solid;
+                border-bottom: 1px solid;
+                background: #f3f3f3;
+            }
+
+                #add article /deep/ label {
+                    padding: 0 .5em;
+                }
+
+                #add article /deep/ input {
+                    background: #f3f3f3;
+                }
         </style>
-
-        <!-- #region types -->
-
-
 
         <template if="{{Type !== 'Component'}}">
 
             <label for="{{Name}}">{{Name}}</label>
 
         </template>
+
+        <!-- #region types -->
 
         <template if="{{Type === 'String'}}">
 
@@ -66,7 +89,7 @@
 
         <template if="{{Type === 'Textbox'}}">
 
-            <textarea name="{{Name}}" required>{{Value}}</textarea>
+            <textarea name="{{Name}}" value="{{Value}}" required></textarea>
 
         </template>
 
@@ -99,20 +122,110 @@
         <template if="{{Type === 'Component'}}">
 
             <el-component name="{{Name}}"
-                          data="{{Value}}"
+                          type="{{Type}}"
+                          props="{{Value}}"
                           nested="true">
             </el-component>
 
         </template>
 
         <!-- #endregion -->
+        <!-- #region list -->
+
+        <template if="{{ Type | isList}}">
+
+            <section id="listItems"></section>
+
+            <section id="add" layout vertical center>
+
+                <section layout horizontal center>
+                    <div flex></div>
+                    <button on-tap="{{showAddListItem}}">
+                        <core-icon icon="add"></core-icon>
+                    </button>
+                </section>
+
+                <article hidden>
+
+                    <el-property name="{{Name}}"
+                                 type="{{Type | listType}}"
+                                 value>
+                    </el-property>
+
+                    <section layout horizontal center>
+                        <div flex></div>
+                        <button on-tap="{{addListItem}}">
+                            <core-icon icon="check"></core-icon>
+                        </button>
+                    </section>
+
+                </article>
+
+            </section>
+
+        </template>
 
     </template>
+
+    <!-- #endregion -->
 
     <script>
         Polymer({
             ready: function () {
+                if (this.isList(this.Type))
+                    this.Value = [];
+            },
+            isList: function (value) {
 
+                if (value.match(/^List /) !== null)
+                    return true;
+
+                return false;
+
+            },
+            listType: function (value) {
+                return value.replace(/List\s*/, "");
+            },
+            ValueChanged: function () {
+                if (this.isList(this.Type)) {
+                    var items = '';
+
+                    for (var i = 0; i < this.Value.length; i++) {
+                        var value = this.Value[i];
+
+                        if (value !== undefined)
+                            items += "<section layout horizontal justified>" +
+                                         "<p>" + value + "</p>" +
+                                         "<button data-index='" + i + "' on-tap='{{deleteListItem}}'>" +
+                                             "<core-icon icon='close'></core-icon>" +
+                                         "</button>" +
+                                     "</section>";
+                    }
+
+                    this.injectBoundHTML(items, this.$.listItems);
+                }
+
+            },
+            showAddListItem: function (e, detail, sender) {
+                this.$.add.querySelector("section").setAttribute("hidden", "");
+
+                this.$.add.querySelector("article").removeAttribute("hidden");
+            },
+            addListItem: function () {
+                var value = this.$.add.querySelector("article el-property").Value;
+
+                if (this.Value.length !== undefined)
+                    this.Value[this.Value.length] = value;
+                else this.Value[0] = value;
+
+                this.$.add.querySelector("section").removeAttribute("hidden");
+
+                this.$.add.querySelector("article").setAttribute("hidden", "");
+            },
+            deleteListItem: function (e, detail, sender) {
+                var i = sender.getAttribute("data-index");
+
+                this.Value[i] = undefined;
             },
             Name: "loading",
             Type: undefined,
