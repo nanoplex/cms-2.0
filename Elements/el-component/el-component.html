@@ -23,10 +23,15 @@
         </style>
 
         <section layout horizontal center>
+
             <h2 flex>{{Name}}</h2>
-            <button on-tap="{{close}}">
-                <core-icon icon="close"></core-icon>
-            </button>
+
+            <template if="{{!nested}}">
+                <button on-tap="{{close}}">
+                    <core-icon icon="close"></core-icon>
+                </button>
+            </template>
+
         </section>
 
         <section id="components"
@@ -54,133 +59,5 @@
         </section>
 
     </template>
-    <script>
-        var self;
-
-        Polymer({
-            ready: function () {
-                if (this.Name !== undefined) {
-
-                    self = this;
-
-                    console.log("component data", this.name);
-                    console.log("component data", this.Props);
-
-                    if (this.nested) {
-                        this.$.button.setAttribute("hidden", "");
-                    }
-                }
-            },
-
-            finish: function () {
-
-                if (this._id == undefined) {
-                    this.Add();
-                }
-                else {
-                    this.Edit();
-                }
-
-                this.Props = null;
-                this.Name = null;
-            },
-            close: function () {
-                page.SelectedPage = page.LastPage;
-
-                this.Props = null;
-                this.Name = null;
-            },
-
-            Add: function () {
-                var images = [],
-                    imgI = 0,
-                    properties = document.querySelector("section[data-pagename=view-component] el-component").shadowRoot.querySelectorAll("el-property");
-
-                for (var i = 0; i < properties.length; i++) {
-                    images[imgI] = properties[i].shadowRoot.querySelector("input[type=file]");
-                    imgI++;
-                }
-
-                page.$.ajaxAddComponent.body = new FormData();
-                page.$.ajaxAddComponent.contentType = null;
-
-                page.$.ajaxAddComponent.body.append(
-                    "component",
-                    JSON.stringify(this.getComponent()).replace(/"/g, "'"));
-
-                page.$.ajaxAddComponent.body.append(
-                    "componentName",
-                    this.Name);
-
-                page.$.ajaxAddComponent.body.append(
-                    "pageName",
-                    page.LastPage);
-
-                console.log(images);
-                for (var a = 0; a < images.length; a++) {
-                    if (images[a] != null) {
-                        for (var b = 0; b < images[a].files.length; b++) {
-
-                            var file = images[a].files[b];
-
-                            page.$.ajaxAddComponent.body.append(file.name, file);
-
-                        }
-                    }
-                }
-
-                page.$.ajaxAddComponent.go();
-            },
-            Edit: function () {
-                // TODO
-            },
-
-            getComponent: function () {
-
-                var comp = "{";
-
-                for (var i = 0; i < this.Props.length; i++) {
-                    if (this.Props[i].Type === "Component") {
-
-                        var componentData = this.$.components
-                            .querySelector("el-property[name=" + this.Props[i].Name + "]")
-                            .querySelector("el-component")
-                            .getComponent();
-
-                        comp += '"' + this.Props[i].Name + '":' + JSON.stringify(componentData) + ',';
-
-                    }
-                    else if (this.Props[i].Type.match(/^List\s*/) != null) {
-                        comp += '"' + this.Props[i].Name + '":[';
-
-                        var values = this.Props[i].Value;
-
-                        for (var a = 0; a < values.length; a++) {
-                            comp += '"' + values[a] + '",';
-                        }
-                        comp = comp.replace(/,$/, '');
-
-                        comp += '],';
-                    }
-                    else {
-                        comp += '"' + this.Props[i].Name + '":"' + this.Props[i].Value + '",';
-                    }
-
-                }
-
-                comp = JSON.parse(comp.replace(/,$/, '') + "}");
-
-                console.log("get component", comp);
-
-                return comp;
-            },
-
-            _id: undefined,
-            Name: "loading",
-            Props: [],
-            pagename: undefined,
-            nested: false,
-            data: undefined
-        })
-    </script>
+    <script src="el-component.js"></script>
 </polymer-element>

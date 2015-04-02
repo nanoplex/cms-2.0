@@ -12,8 +12,11 @@
 
     <script>
         Polymer({
+            Name: undefined,
+            PublishDate: undefined,
+            Visible: undefined,
+            Components: undefined,
             ready: function () {
-
                 this.Name = this.data.Name;
                 this.PublishDate = this.data.PublishDate;
                 this.Visible = this.data.Visible;
@@ -29,12 +32,10 @@
                     this.injectBoundHTML(str, this.$.Components);
                 }
             },
-
-            Name: "Loading..",
-            PublishDate: undefined,
-            Visible: false,
-            Components: [],
-            data: undefined
+            NameChanged: function () { this.ready(); },
+            PublishDateChanged: function () { this.ready(); },
+            VisibleChanged: function () { this.ready(); },
+            ComponentsChanged: function () { this.ready(); }
         })
     </script>
 </polymer-element>

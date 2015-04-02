@@ -1,0 +1,63 @@
+﻿label,
+input,
+textarea {
+    width: 350px;
+}
+
+section[data-pagename^=view-] {
+    min-height: 60vh;
+    margin-top: 5em;
+}
+
+input, textarea {
+    border: none;
+    border-bottom: 1px solid;
+    margin-bottom: 1em;
+    padding: 1em 0;
+    outline: none;
+    -moz-transition: border-bottom-width .3s, border-bottom-color .5s;
+    -o-transition: border-bottom-width .3s, border-bottom-color .5s;
+    -webkit-transition: border-bottom-width .3s, border-bottom-color .5s;
+    transition: border-bottom-width .3s, border-bottom-color .5s;
+}
+
+    input:focus, textarea:focus {
+        border-bottom-width: 2px;
+    }
+
+        input:focus:invalid, textarea:focus:invalid {
+            border-bottom-color: #F44336;
+        }
+
+textarea {
+    min-height: 50px;
+    max-width: 350px;
+}
+
+#listItems section {
+    width: 350px;
+}
+
+#listItems /deep/ button:hover {
+    background: transparent !important;
+}
+
+#add section {
+    width: 350px;
+}
+
+#add article {
+    padding: 1em 0;
+    margin: 1em 0;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    background: #f3f3f3;
+}
+
+    #add article /deep/ label {
+        padding: 0 .5em;
+    }
+
+    #add article /deep/ input, #add article /deep/ textarea {
+        background: #f3f3f3;
+    }

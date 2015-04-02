@@ -5,7 +5,5 @@ using System.Text;
 
 namespace cms.Components
 {
-    class textboxAttribute : Attribute
-    {
-    }
+    class textboxAttribute : Attribute {}
 }

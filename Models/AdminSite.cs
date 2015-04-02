@@ -1,15 +1,10 @@
-﻿using System;
+﻿using mongo;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.ModelBinding;
-using mongo;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using System.Reflection;
-using cms.Components;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Driver.Builders;
+using System.Text.RegularExpressions;
 namespace cms.Models
 {
     public class AdminSite : Site
@@ -26,36 +21,34 @@ namespace cms.Models
             {
                 var adminSite = Db.Collection().FindOneAs<Site>();
 
-                _id = adminSite._id;
-                Name = adminSite.Name;
-
-                Pages = Page.Db.Collection().FindAllAs<Page>()
-                    .Where(p => p.Visibile == true)
-                    .OrderByDescending(p => p.Order).ToList();
-
-                User = cms.Models.User.Db.Collection().FindOneAs<User>();
-
-                Settings = cms.Models.Settings.Db.Collection().FindOneAs<Settings>();
-
-                if (Settings != null)
+                if (adminSite != null)
                 {
-                    FileLog.Instance.SetMessages(Settings.LogLevel);
+                    _id = adminSite._id;
+                    Name = adminSite.Name;
 
-                    if (Settings.Email)
-                        EmailLog.Instance.SetMessages(Settings.LogLevel);
+                    Pages = Page.Db.Collection().FindAllAs<Page>()
+                        .Where(p => p.Visible == true)
+                        .OrderByDescending(p => p.Order).ToList();
+
+                    User = cms.Models.User.Db.Collection().FindOneAs<User>();
+
+                    Settings = cms.Models.Settings.Db.Collection().FindOneAs<Settings>();
+
+                    if (Settings != null)
+                    {
+                        FileLog.Instance.SetMessages(Settings.LogLevel);
+
+                        if (Settings.Email)
+                            EmailLog.Instance.SetMessages(Settings.LogLevel);
+                    }
+
+                    GetComponents();
                 }
-
-                GetComponents();
-            }
-            catch (NullReferenceException)
-            {
-                Name = "Site does not exist";
             }
             catch (MongoConnectionException)
             {
                 Name = "Server could not connect to database";
             }
-
         }
 
         private void GetComponents()
@@ -86,11 +79,10 @@ namespace cms.Models
             foreach (var prop in properties)
             {
                 var attrs = prop.GetCustomAttributes();
-
+                var type = prop.PropertyType.Name;
+                var name = prop.Name;
                 var used = true;
-                var image = false;
-                var textbox = false;
-                var typeComponent = false;
+                object value = null;
 
                 foreach (var attr in attrs)
                 {
@@ -100,45 +92,30 @@ namespace cms.Models
                         used = false;
 
                     if (attrName == "imageAttribute")
-                        image = true;
+                        type = "Image";
 
                     if (attrName == "textboxAttribute")
-                        textbox = true;
+                        type = "Textbox";
+
                 }
 
-                if (used)
+                if (type == "List`1")
                 {
+                    type = "List " + prop.PropertyType.GenericTypeArguments[0].Name;
+                    value = new string[] { };
+                }
 
-                    var name = prop.Name;
-                    var type = prop.PropertyType.Name;
-                    object value = null;
-
-                    if (type == "List`1")
-                    {
-                        type = "List " + prop.PropertyType.GenericTypeArguments[0].Name;
-                        value = new string[]{};
-                    }
-
-                    foreach (var c in components)
-                    {
-                        if (type == c.Name)
-                            typeComponent = true;
-                    }
-
-                    if (image)
-                    {
-                        type = "Image";
-                    }
-                    else if (textbox)
-                    {
-                        type = "Textbox";
-                    }
-                    else if (typeComponent)
+                foreach (var c in components)
+                {
+                    if (type == c.Name)
                     {
                         type = "Component";
                         value = GetComponent(prop.PropertyType, components);
                     }
+                }
 
+                if (used)
+                {
                     selectedProperties.Add(new Prop
                     {
                         Name = name,

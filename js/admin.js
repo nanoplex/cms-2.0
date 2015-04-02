@@ -120,10 +120,27 @@
     };
 
     page.login = function () {
-        loginStatus = document.querySelector("section[data-pagename=view-login] .status");
-        page.injectBoundHTML("<paper-spinner active><paper-spinner/>", loginStatus);
+        var email = document.querySelector("input[name=email]"),
+            emailValid = email.validity.valid,
+            pass = document.querySelector("input[name=password]"),
+            passValid = pass.validity.valid;
 
-        page.$.ajaxLogin.go();
+        loginStatus = document.querySelector("section[data-pagename=view-login] .status");
+
+        if (emailValid && passValid) {
+            
+            page.injectBoundHTML("<paper-spinner active><paper-spinner/>", loginStatus);
+
+            page.$.ajaxLogin.go();
+        }
+        else {
+            if (!emailValid)
+                email.focus();
+            else if (!passValid)
+                pass.focus();
+
+            loginStatus.innerHTML = "";
+        }
     };
 
     page.deletePage = function (id) {
@@ -155,7 +172,10 @@
 
     page.setTitle = function () {
         var title = document.querySelector("title");
-        page.injectBoundHTML(page.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - Admin", title);
+
+        page.injectBoundHTML(
+            page.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - Admin",
+            title);
     };
     page.home = function () {
         page.SelectedPage = page.LastPage;
@@ -225,7 +245,6 @@
             if (page.Site.Components[i].Name === name)
                 component = page.Site.Components[i];
         }
-        console.log("data", component);
 
         elComponent.Name = component.Name;
         elComponent.Props = component.Props;

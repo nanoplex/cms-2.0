@@ -124,11 +124,15 @@ nav {
             border-top: 1px solid black;
         }
 
-h2,
+section[data-pagename^=view-] > h2,
 .btn,
 label,
 input,
 textarea {
+    width: 350px;
+}
+
+section[data-pagename^=view-] section:first-child {
     width: 350px;
 }
 

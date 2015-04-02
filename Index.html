@@ -5,6 +5,7 @@
 
     <link rel="import" href="/Elements/Elements.html" />
     <link rel="import" href="/Components/Components.html" />
+
 </head>
 <body>
     <template is="auto-binding" id="site">
@@ -18,25 +19,40 @@
         </core-ajax>
 
         <header>
+
             <h1>{{Site.Name}}</h1>
+
             <nav>
                 <template repeat="{{page in Site.Pages}}">
-                    <button on-tap="{{SelectPage}}">{{page.Name}}</button>
+
+                    <button on-tap="{{SelectPage}}">
+                        {{page.Name}}
+                    </button>
+
                 </template>
             </nav>
+
         </header>
 
         <core-pages id="pages"
                     selected="{{SelectedPage}}"
                     valueattr="data-pagename">
-            <section data-pagename="view-loading" layout vertical center>
-                <paper-spinner active style="margin-top: 4em;"></paper-spinner>
+
+            <section data-pagename="view-loading" 
+                     layout vertical center>
+
+                <paper-spinner active style="margin-top: 4em;">
+                </paper-spinner>
+
             </section>
 
             <template repeat="{{page in Site.Pages}}">
 
                 <section data-pagename="{{page.Name}}">
-                    <el-page data="{{page}}"></el-page>
+
+                    <el-page data="{{page}}">
+                    </el-page>
+
                 </section>
 
             </template>
@@ -51,23 +67,24 @@
 
         site.SelectedPage = "view-loading";
 
-        function page.setTitle() {
+        site.setTitle = function () {
             document.querySelector("title").innerHTML = site.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - " + site.Site.Name;
         };
 
         site.ready = function () {
             this.HandleSite = function (res) {
                 site.Site = res.detail.response;
+                console.log("site", site.Site);
 
                 if (site.Site.Pages != null)
                     site.SelectedPage = site.Site.Pages[0].Name;
                 else
                     site.SelectedPage = "loading";
-                page.setTitle();
+                site.setTitle();
             };
             this.SelectPage = function (event, a, e) {
                 site.SelectedPage = e.innerHTML;
-                page.setTitle();
+                site.setTitle();
             };
         };
 

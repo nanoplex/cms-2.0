@@ -27,7 +27,33 @@ namespace cms.Components
 
         public override string Frontend
         {
-            get { throw new NotImplementedException(); }
+            get 
+            {
+                var str = "";
+
+                str += "<p>" + String + "</p>";
+                str += "<p>" + Textbox + "</p>";
+                str += "<p>" + Int + "</p>";
+                str += "<p>" + Bool + "</p>";
+                str += "<img src='" + _id + "1.jpeg'/>";
+                str += "<p>string list</p>";
+                foreach (var s in stringList)
+                {
+                    str += "<p>" + s + "</p>";
+                }
+                str += "<p>int list</p>";
+                foreach (var i in intList)
+                {
+                    str += "<p>" + i + "</p>";
+                }
+                str += TextComponent.Frontend;
+                foreach (var text in ListTextComponent)
+                {
+                    str += text.Frontend;
+                }
+
+                return str;
+            }
         }
     }
 }

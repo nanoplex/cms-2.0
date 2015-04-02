@@ -36,7 +36,7 @@ namespace cms.Controllers
         private List<Page> GetPages()
         {
             return Page.Db.Collection().FindAllAs<Page>()
-                .Where(p => p.Visibile == true)
+                .Where(p => p.Visible == true)
                 .OrderByDescending(p => p.Order)
                 .ToList();
         }
@@ -117,7 +117,7 @@ namespace cms.Controllers
                 page.Name = name;
                 page.Order = order;
                 page.PublishDate = DateTime.Now;
-                page.Visibile = true;
+                page.Visible = true;
 
                 Page.Db.Add(page);
 
