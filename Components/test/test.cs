@@ -35,7 +35,7 @@ namespace cms.Components
                 str += "<p>" + Textbox + "</p>";
                 str += "<p>" + Int + "</p>";
                 str += "<p>" + Bool + "</p>";
-                str += "<img src='" + _id + "1.jpeg'/>";
+                str += "<img src='/uploads/images/" + _id + "0.jpeg'/>";
                 str += "<p>string list</p>";
                 foreach (var s in stringList)
                 {

@@ -15,17 +15,11 @@
 
                 self = this;
 
-                console.log("component name", this.Name);
-                console.log("component props", this.Props);
-
                 if (this.nested) {
                     this.$.button.setAttribute("hidden", "");
 
                 }
             }
-        },
-        NameChanged: function () {
-            this.ready();
         },
         finish: function () {
 
@@ -71,7 +65,6 @@
                 "pageName",
                 page.LastPage);
 
-            console.log(images);
             for (var a = 0; a < images.length; a++) {
                 if (images[a] != null) {
                     for (var b = 0; b < images[a].files.length; b++) {
@@ -89,71 +82,71 @@
         Edit: function () {
             // TODO
         },
-        getComponent: function () {
+        getComponent: function (Props) {
+
+            if (Props === undefined)
+                Props = this.Props;
+
+            console.log("props", Props);
 
             var comp = "{";
 
-            for (var i = 0; i < this.Props.length; i++) {
-                if (this.Props[i].Type === "Component") {
+            for (var i = 0; i < Props.length; i++) {
+                if (Props[i].Type === "Component") {
 
                     var props = this.$.components.querySelectorAll("el-property"),
                         componentData;
 
                     for (var a = 0; a < props.length; a++) {
-                        if (props[a].Name == this.Props[i].Name)
+                        if (props[a].Name == Props[i].Name)
                             componentData = props[a].shadowRoot.querySelector("el-component").getComponent();
                     }
 
-                    comp += '"' + this.Props[i].Name + '":' + JSON.stringify(componentData) + ',';
+                    comp += '"' + Props[i].Name + '":' + JSON.stringify(componentData) + ',';
 
                 }
-                else if (this.Props[i].Type.match(/^List\s*/) != null) {
-                    comp += '"' + this.Props[i].Name + '":[';
+                else if (Props[i].Type.match(/^List\s*/) != null) {
+                    var c = false;
 
-                    var values = this.Props[i].Value,
-                        c = false,
-                        type = this.Props[i].Type.replace(/^List /,"");
+                    comp += '"' + Props[i].Name + '":';
 
-                    console.log(type);
+                    console.log("secound get", Props[i]);
 
                     for (var a = 0; a < page.Site.Components.length; a++) {
                         var component = page.Site.Components[a];
 
-                        if (component.Name == type)
+                        if (component.Name === Props[i].Type.replace(/^List\s*/, '')) {
                             c = true;
+                        } 
                     }
 
-                    console.log(c);
+                    if (!c)
+                        comp += JSON.stringify(Props[i].Value) + ",";
+                    else {
+                        comp += '[';
 
-                    for (var a = 0; a < values.length; a++) {
-                        if (c) {
-                            comp += '{'
-                            for (var b = 0; b < values[a].Props.length; b++) {
-                                var p = values[a].Props[b];
+                        var innerComponents = Props[i].Value;
 
-                                comp += '"' + p.Name + '":"' + p.Value + '",';
-                            }
+                        for (var a = 0; a < innerComponents.length; a++) {
+                            var innerComponent = JSON.parse(innerComponents[a]);
 
-                            comp = comp.replace(/,$/, '') + '},';
-
-                        } else {
-                            comp += '"' + values[a] + '",';
+                            comp += JSON.stringify(this.getComponent(innerComponent.Props)) + ",";
                         }
-                        
-                    }
-                    comp = comp.replace(/,$/, '');
+                        comp = comp.replace(/,$/, "");
 
-                    comp += '],';
+                        comp += '],';
+                    }
                 }
                 else {
-                    comp += '"' + this.Props[i].Name + '":"' + this.Props[i].Value + '",';
+                    comp += '"' + Props[i].Name + '":"' + Props[i].Value + '",';
                 }
-
             }
 
-            comp = JSON.parse(comp.replace(/,$/, '') + "}");
+            comp = comp.replace(/,$/, "") + "}";
 
             console.log("get component", comp);
+
+            comp = JSON.parse(comp);
 
             return comp;
         }

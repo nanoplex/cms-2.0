@@ -20,90 +20,57 @@
             return false;
 
         },
+        toJSON: function(value) {
+            return JSON.parse(value);
+        },
         listType: function (value) {
-            var t = value.replace(/^List\s*/, "");
+            var type = value.replace(/^List\s*/, "");
 
             if (this.selectedComponent === undefined) {
 
                 for (var i = 0; i < page.Site.Components.length; i++) {
                     var component = page.Site.Components[i];
 
-                    if (component.Name == t)
+                    if (component.Name == type)
                         this.selectedComponent = component;
                 }
             }
 
-            if (this.selectedComponent !== undefined && t === this.selectedComponent.Name)
+            if (this.selectedComponent !== undefined && type === this.selectedComponent.Name)
                 return "Component";
 
-            console.log(":(");
-            return t;
+            return type;
         },
-        ValueChanged: function () {
-            if (this.isList(this.Type)) {
-                var items = '';
+        showAddListItem: function () {
+            var add = this.$.add;
 
-                console.log("selected component", this.selectedComponent);
-
-                for (var i = 0; i < this.Value.length; i++) {
-                    var value = this.Value[i];
-                    console.log("value", this.Value);
-
-                    if (value !== undefined) {
-                        if (this.selectedComponent !== undefined) {
-
-                            items += "<section layout horizontal justified start>" +
-                                     "<article layout vertical>";
-
-                            for (var a = 0; a < this.selectedComponent.Props.length; a++) {
-                                items += "<p><b>" + value.Props[a].Name + "</b> " + value.Props[a].Value + "</p>";
-                            }
-
-                            items += "</article>" +
-                                     "<button data-index='" + i + "' on-tap='{{deleteListItem}}'>" +
-                                         "<core-icon icon='close'></core-icon>" +
-                                     "</button>" +
-                                 "</section>";
-                        }
-                        else {
-                            items += "<section layout horizontal justified>" +
-                                          "<p>" + value + "</p>" +
-                                          "<button data-index='" + i + "' on-tap='{{deleteListItem}}'>" +
-                                              "<core-icon icon='close'></core-icon>" +
-                                          "</button>" +
-                                      "</section>";
-                        }
-                    }
-                }
-                this.injectBoundHTML(items, this.$.listItems);
-            }
-
-        },
-        showAddListItem: function (e, detail, sender) {
-            this.$.add.querySelector("section").setAttribute("hidden", "");
-
-            this.$.add.querySelector("article").removeAttribute("hidden");
+            add.querySelector("section").setAttribute("hidden", "");
+            add.querySelector("article").removeAttribute("hidden");
         },
         addListItem: function () {
-            var value = this.$.add.querySelector("article el-property").Value;
+            var add = this.$.add,
+                prop = add.querySelector("article el-property");
+                
 
-            if (this.Value.length !== undefined)
-                this.Value[this.Value.length] = value;
-            else this.Value = []; this.Value[0] = value;
-
-            this.$.add.querySelector("section").removeAttribute("hidden");
-
-            this.$.add.querySelector("article").setAttribute("hidden", "");
+            if (this.selectedComponent !== undefined) {
+                this.Value[this.Value.length] = JSON.stringify(prop.Value);
+                prop.Value = '';
+            }
+            else {
+                this.Value[this.Value.length] = prop.Value;
+                prop.Value = '';
+            }
+            
+            add.querySelector("section").removeAttribute("hidden");
+            add.querySelector("article").setAttribute("hidden", "");
         },
         deleteListItem: function (e, detail, sender) {
-            var i = sender.getAttribute("data-index");
-
-            this.Value[i] = undefined;
+            this.Value[parseInt(sender.getAttribute("data-index"), 10)] = undefined;
         },
-        getEmptyComponent: function () {
+        getEmptyComponent: function (value) {
             if (this.selectedComponent !== undefined)
                 return this.selectedComponent;
-            else return undefined;
+            else return value;
         }
     });
 })();

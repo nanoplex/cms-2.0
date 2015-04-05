@@ -3,8 +3,6 @@
                  layout vertical center>
     <template>
 
-        <!-- TODO validation -->
-
         <link rel="stylesheet"
               href="el-property.css" />
 
@@ -29,10 +27,9 @@
 
         <template if="{{Type === 'Textbox'}}">
 
-            <textarea name="{{Name}}" 
-                      value="{{Value}}" 
-                      required>
-            </textarea>
+            <textarea name="{{Name}}"
+                      value="{{Value}}"
+                      required></textarea>
 
         </template>
 
@@ -72,57 +69,86 @@
         </template>
 
         <!-- #endregion -->
-
         <!-- #region list -->
 
-        <template if="{{ Type | isList}}">
+        <section layout verical start>
+            <template if="{{Type | isList}}">
+                <template repeat="{{value, a in Value}}">
+                    <template if="{{value !== undefined}}">
 
-            <section id="listItems">
-            </section>
+                        <template if="{{selectedComponent !== undefined}}">
+                            <section layout horizontal justified start flex>
+                                <template repeat="{{prop in toJSON(value).Props}}">
+                                    <article layout vertical>
+                                        <p>
+                                            <b>{{prop.Name}}</b>
+                                            {{prop.Value}}
+                                        </p>
+                                    </article>
+                                </template>
+                                <button data-index="{{a}}" on-tap="{{deleteListItem}}">
+                                    <core-icon icon="close"></core-icon>
+                                </button>
+                            </section>
+                        </template>
 
-            <section id="add" 
-                     layout vertical center>
+                        <template if="{{selectedComponent === undefined}}">
+                            <section layout horizontal justified flex>
+                                <p>{{value}}</p>
+                                <button data-index="{{a}}" on-tap="{{deleteListItem}}">
+                                    <core-icon icon="close"></core-icon>
+                                </button>
+                            </section>
+                        </template>
 
-                <section layout horizontal center>
-
-                    <div flex></div>
-
-                    <button on-tap="{{showAddListItem}}">
-                        <core-icon icon="add"></core-icon>
-                    </button>
-
-                </section>
-
-                <article hidden>
-                    <template if="{{listType(Type) != 'Component'}}">
-                        <el-property name="{{Name}}"
-                                     type="{{Type | listType}}"
-                                     value>
-                        </el-property>
                     </template>
+                </template>
 
-                    <template if="{{listType(Type) == 'Component'}}">
-                        <el-property name="{{Name}}"
-                                     type="{{Type | listType}}"
-                                     value="{{obj | getEmptyComponent}}">
-                        </el-property>
-                    </template>
+                <section id="add"
+                         layout vertical center>
 
                     <section layout horizontal center>
 
                         <div flex></div>
 
-                        <button on-tap="{{addListItem}}">
-                            <core-icon icon="check"></core-icon>
+                        <button on-tap="{{showAddListItem}}">
+                            <core-icon icon="add"></core-icon>
                         </button>
 
                     </section>
 
-                </article>
+                    <article hidden>
 
-            </section>
+                        <template if="{{listType(Type) !== 'Component'}}">
+                            <el-property name="{{Name}}"
+                                         type="{{Type | listType}}"
+                                         value>
+                            </el-property>
+                        </template>
 
-        </template>
+                        <template if="{{listType(Type) === 'Component'}}">
+                            <el-property name="{{Name}}"
+                                         type="{{Type | listType}}"
+                                         value="{{Obj | getEmptyComponent}}">
+                            </el-property>
+                        </template>
+
+                        <section layout horizontal center>
+
+                            <div flex></div>
+
+                            <button on-tap="{{addListItem}}">
+                                <core-icon icon="check"></core-icon>
+                            </button>
+
+                        </section>
+
+                    </article>
+
+                </section>
+
+            </template>
+        </section>
 
     </template>
 

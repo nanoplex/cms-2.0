@@ -236,7 +236,7 @@
     };
 
     page.showAddComponent = function (a, b, e) {
-        var elComponent = document.querySelector("section[data-pagename=view-component] el-component"),
+            var elComponent = new ElComponent(),
             name = e.getAttribute("data-name"),
             component,
             data;
@@ -248,6 +248,9 @@
 
         elComponent.Name = component.Name;
         elComponent.Props = component.Props;
+
+        this.$.viewComponent.innerHTML = '';
+        this.$.viewComponent.appendChild(elComponent);
 
         page.LastPage = page.SelectedPage;
         page.SelectedPage = "view-component";
