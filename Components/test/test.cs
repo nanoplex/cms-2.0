@@ -29,24 +29,26 @@ namespace cms.Components
         {
             get 
             {
-                var str = "";
+                var str = "<p>" + String +"</p>" +
+                          "<p>" + Textbox + "</p>" +
+                          "<p>" + Int + "</p>" +
+                          "<p>" + Bool + "</p>" +
+                          "<img src='/uploads/images/" + _id + "0.jpeg'/>" +
 
-                str += "<p>" + String + "</p>";
-                str += "<p>" + Textbox + "</p>";
-                str += "<p>" + Int + "</p>";
-                str += "<p>" + Bool + "</p>";
-                str += "<img src='/uploads/images/" + _id + "0.jpeg'/>";
-                str += "<p>string list</p>";
+                "<p>string list</p>";
                 foreach (var s in stringList)
                 {
                     str += "<p>" + s + "</p>";
                 }
+
                 str += "<p>int list</p>";
                 foreach (var i in intList)
                 {
                     str += "<p>" + i + "</p>";
                 }
+
                 str += TextComponent.Frontend;
+
                 foreach (var text in ListTextComponent)
                 {
                     str += text.Frontend;

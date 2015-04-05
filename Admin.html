@@ -14,11 +14,6 @@
     <link href="css/admin.min.css" 
           rel="stylesheet" />
 
-    <script src="/bower_components/webcomponentsjs/webcomponents.min.js" 
-            async 
-            defer>
-    </script>
-
 </head>
 <body>
     <template is="auto-binding" id="page">
@@ -232,11 +227,7 @@
 
                             <h3>{{page.Name}}</h3>
 
-                            <template repeat="{{component in page.Components}}">
-
-                                <p>{{component._t}}</p>
-
-                            </template>
+                            <section id="components"></section>
 
                         </section>
 
@@ -304,6 +295,11 @@
 
     </template>
 
-    <script src="js/admin.min.js"></script>
+    <script src="/bower_components/webcomponentsjs/webcomponents.min.js"
+            async
+            defer>
+    </script>
+    <script src="js/admin.min.js">
+    </script>
 </body>
 </html>

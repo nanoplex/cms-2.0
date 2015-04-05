@@ -24,11 +24,14 @@ namespace cms.Controllers
             site.Pages = GetPages();
 
             var str = BsonExtensionMethods.ToJson<AdminSite>(site);
-            str = Regex.Replace(str, @":\s*ObjectId\(", ":", RegexOptions.Multiline);
-            str = Regex.Replace(str, @":\s*ISODate\(", ":", RegexOptions.Multiline);
-            str = Regex.Replace(str, @"System.String\[", "[", RegexOptions.Multiline);
-            str = Regex.Replace(str, @"\)\s*,", ",", RegexOptions.Multiline);
-            str = Regex.Replace(str, @"\)\s*}", "}", RegexOptions.Multiline);
+
+            str = Regex.Replace(Regex.Replace(Regex.Replace(Regex.Replace(Regex.Replace(
+                    str, 
+                    @":\s*ObjectId\(", ":", RegexOptions.Multiline),
+                    @":\s*ISODate\(", ":", RegexOptions.Multiline), 
+                    @"System.String\[", "[", RegexOptions.Multiline), 
+                    @"\)\s*,", ",", RegexOptions.Multiline), 
+                    @"\)\s*}", "}", RegexOptions.Multiline);
 
             return str;
         }
@@ -44,10 +47,7 @@ namespace cms.Controllers
         [HttpGet]
         public bool CheckAuthorization()
         {
-            if (Session["user"] != null)
-            {
-                return true;
-            }
+            if (Session["user"] != null) return true;
             else
             {
                 site = null;

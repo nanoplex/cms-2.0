@@ -78,27 +78,34 @@
 
                         <template if="{{selectedComponent !== undefined}}">
                             <section layout horizontal justified start flex>
+
                                 <template repeat="{{prop in toJSON(value).Props}}">
+
                                     <article layout vertical>
                                         <p>
                                             <b>{{prop.Name}}</b>
                                             {{prop.Value}}
                                         </p>
                                     </article>
+
                                 </template>
+
                                 <button data-index="{{a}}" on-tap="{{deleteListItem}}">
                                     <core-icon icon="close"></core-icon>
                                 </button>
+
                             </section>
                         </template>
 
                         <template if="{{selectedComponent === undefined}}">
+
                             <section layout horizontal justified flex>
                                 <p>{{value}}</p>
                                 <button data-index="{{a}}" on-tap="{{deleteListItem}}">
                                     <core-icon icon="close"></core-icon>
                                 </button>
                             </section>
+
                         </template>
 
                     </template>

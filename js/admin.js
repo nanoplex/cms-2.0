@@ -5,24 +5,18 @@
     var page = document.getElementById("page"),
         loginStatus;
 
-    page.SelectedPage = "view-loading";
-
-
     page.ready = function () {
-        page.setTitle();
+        page.changeView("view-loading");
     };
 
     page.handleAuth = function (res) {
         res = res.detail.response;
+        page.changeView("view-loading");
 
-        page.SelectedPage = "view-loading";
-
-        if (res === "True") {
+        if (res === "True")
             page.$.ajaxSite.go();
-        }
         else if (res === "False") {
-            page.SelectedPage = "view-login";
-            page.setTitle();
+            page.changeView("view-login");
         }
     };
 
@@ -35,9 +29,7 @@
 
             page.$.ajaxAuth.go();
         }
-        else {
-            loginStatus.innerHTML = res;
-        }
+        else loginStatus.innerHTML = res;
     };
 
 
@@ -49,12 +41,12 @@
 
         if (res !== null) {
             page.Site = res;
-
-            page.SelectedPage = page.Site.Pages[0].Name;
-            if (page.LastPage != undefined)
-                page.SelectedPage = page.LastPage;
-
-            page.setTitle();
+            
+            if (page.LastPage !== undefined &&
+                page.LastPage !== "view-loading")
+                page.changeView(page.LastPage);
+            else
+                page.changeView(page.Site.Pages[0].Name);
 
             console.log("site", page.Site);
         }
@@ -65,6 +57,7 @@
         Delete = false,
         startPos,
         pos;
+
     page.startPageSelect = function (id) {
         click = false;
         end = false;
@@ -91,13 +84,11 @@
             }
         }, 500);
     };
+
     page.endPageSelect = function (id, name, order) {
 
         if (!end) {
-
-            page.LastPage = name;
-            page.SelectedPage = name;
-            page.setTitle();
+            page.changeView(name);
 
             click = true;
         }
@@ -148,13 +139,13 @@
         page.$.ajaxDeletePage.go();
         Delete = false;
     };
+
     page.addPage = function () {
         var firstNavEl = document.querySelector('nav section:nth-child(4)'),
             order;
 
-        if (firstNavEl === null) {
+        if (firstNavEl === null)
             firstNavEl = document.querySelector('nav section:nth-child(3)');
-        }
 
         if (firstNavEl != null)
             order = (parseInt(firstNavEl.getAttribute("data-order"), 10) + 1);
@@ -170,6 +161,12 @@
         page.newPageName = null;
     };
 
+    page.changeView = function(view) {
+        page.LastPage = page.SelectedPage;
+        page.SelectedPage = view;
+        page.setTitle();
+    };
+
     page.setTitle = function () {
         var title = document.querySelector("title");
 
@@ -177,8 +174,9 @@
             page.SelectedPage.replace(/^view-/, '').replace(/-/g, ' ') + " - Admin",
             title);
     };
+
     page.home = function () {
-        page.SelectedPage = page.LastPage;
+        page.changeView(page.LastPage);
     };
 
     var call = true;
@@ -187,7 +185,7 @@
             message = status.querySelector("p"),
             btn = status.querySelector("button");
 
-        page.SelectedPage = page.LastPage;
+        page.home();
 
         message.innerHTML = msg;
 
@@ -214,9 +212,8 @@
     };
 
     page.toggleAddOptions = function () {
-        if (page.$.addOptions.getAttribute("hidden") == null) {
+        if (page.$.addOptions.getAttribute("hidden") == null)
             page.$.addOptions.setAttribute("hidden", "");
-        }
         else {
             page.$.addOptions.removeAttribute("hidden");
             page.$.addComponentOptions.setAttribute("hidden", "");
@@ -224,20 +221,17 @@
     };
 
     page.showAddPage = function () {
-        page.LastPage = page.SelectedPage;
-        page.SelectedPage = "view-add-page";
-        page.setTitle();
+        page.changeView("view-add-page");
     };
 
     page.showAddComponentOptions = function () {
         page.$.addOptions.setAttribute("hidden", "");
-
         page.$.addComponentOptions.removeAttribute("hidden");
     };
 
-    page.showAddComponent = function (a, b, e) {
+    page.showAddComponent = function (e, detail, sender) {
             var elComponent = new ElComponent(),
-            name = e.getAttribute("data-name"),
+            name = sender.getAttribute("data-name"),
             component,
             data;
 
@@ -249,11 +243,10 @@
         elComponent.Name = component.Name;
         elComponent.Props = component.Props;
 
-        this.$.viewComponent.innerHTML = '';
-        this.$.viewComponent.appendChild(elComponent);
+        page.$.viewComponent.innerHTML = '';
+        page.$.viewComponent.appendChild(elComponent);
 
-        page.LastPage = page.SelectedPage;
-        page.SelectedPage = "view-component";
+        page.changeView("view-component");
 
         page.$.addComponentOptions.setAttribute("hidden", "");
     }

@@ -7,18 +7,16 @@
         Name: "loading",
         Type: undefined,
         Value: undefined,
+        selectedComponent: undefined,
+
         ready: function () {
             if (this.isList(this.Type))
                 this.Value = [];
         },
-        selectedComponent: undefined,
         isList: function (value) {
-
             if (value.match(/^List/) !== null)
                 return true;
-
             return false;
-
         },
         toJSON: function(value) {
             return JSON.parse(value);
@@ -27,7 +25,6 @@
             var type = value.replace(/^List\s*/, "");
 
             if (this.selectedComponent === undefined) {
-
                 for (var i = 0; i < page.Site.Components.length; i++) {
                     var component = page.Site.Components[i];
 
@@ -42,16 +39,13 @@
             return type;
         },
         showAddListItem: function () {
-            var add = this.$.add;
-
-            add.querySelector("section").setAttribute("hidden", "");
-            add.querySelector("article").removeAttribute("hidden");
+            this.$.add.querySelector("section").setAttribute("hidden", "");
+            this.$.add.querySelector("article").removeAttribute("hidden");
         },
         addListItem: function () {
             var add = this.$.add,
                 prop = add.querySelector("article el-property");
-                
-
+            
             if (this.selectedComponent !== undefined) {
                 this.Value[this.Value.length] = JSON.stringify(prop.Value);
                 prop.Value = '';
