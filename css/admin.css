@@ -2,11 +2,11 @@
     font-family: roboto;
 }
 
-body /deep/ * {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
+    body /deep/ * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
 
 core-header-panel /deep/ #dropShadow {
     box-shadow: none !important;
@@ -32,7 +32,7 @@ body /deep/ button {
     transition: background .3s;
 }
 
-    body /deep/ button:hover {
+    body /deep/ button:hover, body /deep/ button:focus {
         background: rgba(33, 150, 243, 0.50);
     }
 
@@ -65,8 +65,9 @@ header {
             margin: .5em;
         }
 
-        header core-icon:hover {
+        header core-icon:hover, header core-icon:focus {
             background: rgba(33, 150, 243, 0.50);
+            outline: none;
         }
 
         header core-icon[icon=account-circle] {
@@ -115,6 +116,10 @@ nav {
         box-shadow: 0 0 0 0;
     }
 
+        nav section:focus {
+            border-bottom-width: 2px;
+        }
+
         nav section p {
             margin: 0;
             padding: 1em;
@@ -124,7 +129,7 @@ nav {
             border-top: 1px solid black;
         }
 
-section[data-pagename^=view-] > h2,
+section[data-pagename^=view-] > h1,
 .btn,
 label,
 input,
@@ -136,9 +141,9 @@ section[data-pagename^=view-] section:first-child {
     width: 350px;
 }
 
-section[data-pagename^=view-] section:first-child button:hover {
-    background: none;
-}
+    section[data-pagename^=view-] section:first-child button:hover {
+        background: none;
+    }
 
 section[data-pagename^=view-] {
     min-height: 60vh;
@@ -239,4 +244,67 @@ textarea {
 
     #status.hidden {
         left: -200%;
+    }
+
+.page {
+    padding: 0 1em;
+}
+.page > h2 {
+    margin-bottom: 2em;
+}
+
+#components {
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+    #components > article {
+        height: 100%;
+        min-width: 120px;
+        border: 1px solid #bdbdbd;
+        border-top: 0;
+        border-bottom: 0;
+        margin-right: 1em;
+        -moz-transition: width .3s;
+        -o-transition: width .3s;
+        -webkit-transition: width .3s;
+        transition: width .3s;
+    }
+
+        #components > article:focus {
+            outline: none;
+        }
+
+        #components > article section p.hidden {
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        #components > article:focus section p.hidden {
+            width: inherit;
+            height: 100%;
+            margin-left: 2em;
+        }
+
+        #components > article:focus h3 {
+            background: #2196F3;
+            color: white;
+        }
+
+    #components h3 {
+        margin: 0;
+        padding: 1em .5em;
+        background: #bdbdbd;
+        -moz-transition: color .3s, background .3s;
+        -o-transition: color .3s, background .3s;
+        -webkit-transition: color .3s, background .3s;
+        transition: color .3s, background .3s;
+    }
+
+    #components > article > section {
+        padding: 0 .5em;
+        border-bottom: 1px solid #bdbdbd;
     }

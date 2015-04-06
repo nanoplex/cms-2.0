@@ -7,7 +7,6 @@
         Props: [],
         pagename: undefined,
         nested: false,
-
         ready: function () {
             if (this.nested)
                 this.$.button.setAttribute("hidden", "");
@@ -30,13 +29,11 @@
         },
         Add: function () {
             var images = [],
-                imgI = 0,
                 properties = document.querySelector("section[data-pagename=view-component] el-component")
                     .shadowRoot.querySelectorAll("el-property");
 
             for (var i = 0; i < properties.length; i++) {
-                images[imgI] = properties[i].shadowRoot.querySelector("input[type=file]");
-                imgI++;
+                images[images.length] = properties[i].shadowRoot.querySelector("input[type=file]");
             }
 
             page.$.ajaxAddComponent.body = new FormData();
@@ -143,5 +140,4 @@
             return comp;
         }
     });
-
 })();

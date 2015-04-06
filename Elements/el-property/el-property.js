@@ -8,35 +8,41 @@
         Type: undefined,
         Value: undefined,
         selectedComponent: undefined,
-
         ready: function () {
-            if (this.isList(this.Type))
+            if (this.isList(this.Type) && this.Value._t !== undefined)
                 this.Value = [];
+        },
+        attached: function () {
+            if (this.selectedComponent === undefined) {
+                for (var i = 0; i < page.Site.Components.length; i++) {
+                    var component = page.Site.Components[i];
+
+                    if (component.Name == this.Type.replace(/^List /, ""))
+                        this.selectedComponent = component;
+                }
+            }
         },
         isList: function (value) {
             if (value.match(/^List/) !== null)
                 return true;
             return false;
         },
-        toJSON: function(value) {
-            return JSON.parse(value);
+        toJSON: function (value) {
+            if (value._id === undefined)
+                return JSON.parse(value);
+            else {
+                var props = [];
+
+                for (var p in value) {
+                    if (p !== "_id")
+                        props[props.length] = { "Name": p, "Value": value[p] };
+                }
+                console.log("new to JSON", props);
+                return {"Props": props};
+            }
         },
         listType: function (value) {
-            var type = value.replace(/^List\s*/, "");
-
-            if (this.selectedComponent === undefined) {
-                for (var i = 0; i < page.Site.Components.length; i++) {
-                    var component = page.Site.Components[i];
-
-                    if (component.Name == type)
-                        this.selectedComponent = component;
-                }
-            }
-
-            if (this.selectedComponent !== undefined && type === this.selectedComponent.Name)
-                return "Component";
-
-            return type;
+            return value.replace(/^List\s*/, "");
         },
         showAddListItem: function () {
             this.$.add.querySelector("section").setAttribute("hidden", "");
@@ -48,13 +54,12 @@
             
             if (this.selectedComponent !== undefined) {
                 this.Value[this.Value.length] = JSON.stringify(prop.Value);
-                prop.Value = '';
             }
             else {
                 this.Value[this.Value.length] = prop.Value;
                 prop.Value = '';
             }
-            
+
             add.querySelector("section").removeAttribute("hidden");
             add.querySelector("article").setAttribute("hidden", "");
         },

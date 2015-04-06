@@ -109,7 +109,6 @@ namespace cms.Models
                 {
                     if (type == c.Name)
                     {
-                        type = "Component";
                         value = GetComponent(prop.PropertyType, components);
                     }
                 }

@@ -6,7 +6,7 @@
         <link rel="stylesheet"
               href="el-property.css" />
 
-        <template if="{{Type !== 'Component'}}">
+        <template if="{{selectedComponent === undefined}}">
 
             <label for="{{Name}}">
                 {{Name}}
@@ -46,7 +46,6 @@
 
             <input type="file"
                    name="{{Name}}"
-                   value="{{Value}}"
                    required />
 
         </template>
@@ -59,7 +58,7 @@
 
         </template>
 
-        <template if="{{Type === 'Component'}}">
+        <template if="{{selectedComponent !== undefined}}">
 
             <el-component name="{{Name}}"
                           props="{{Value.Props}}"
@@ -77,7 +76,7 @@
                     <template if="{{value !== undefined}}">
 
                         <template if="{{selectedComponent !== undefined}}">
-                            <section layout horizontal justified start flex>
+                            <section layout horizontal justified center flex>
 
                                 <template repeat="{{prop in toJSON(value).Props}}">
 
@@ -99,7 +98,7 @@
 
                         <template if="{{selectedComponent === undefined}}">
 
-                            <section layout horizontal justified flex>
+                            <section layout horizontal justified center flex>
                                 <p>{{value}}</p>
                                 <button data-index="{{a}}" on-tap="{{deleteListItem}}">
                                     <core-icon icon="close"></core-icon>
@@ -126,14 +125,14 @@
 
                     <article hidden>
 
-                        <template if="{{listType(Type) !== 'Component'}}">
+                        <template if="{{selectedComponent === undefined}}">
                             <el-property name="{{Name}}"
                                          type="{{Type | listType}}"
                                          value>
                             </el-property>
                         </template>
 
-                        <template if="{{listType(Type) === 'Component'}}">
+                        <template if="{{selectedComponent !== undefined}}">
                             <el-property name="{{Name}}"
                                          type="{{Type | listType}}"
                                          value="{{Obj | getEmptyComponent}}">

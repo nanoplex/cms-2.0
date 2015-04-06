@@ -16,6 +16,7 @@
             PublishDate: undefined,
             Visible: undefined,
             Components: undefined,
+            data: undefined,
             ready: function () {
                 this.Name = this.data.Name;
                 this.PublishDate = this.data.PublishDate;
@@ -34,6 +35,7 @@
             },
             NameChanged: function () { this.ready(); },
             ComponentsChanged: function () { this.ready(); }
-        })
+        });
     </script>
+
 </polymer-element>

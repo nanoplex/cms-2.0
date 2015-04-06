@@ -122,7 +122,8 @@
                 <header id="header" hidden>
                     <section layout horizontal center>
 
-                        <core-icon on-tap="{{toggleNav}}" 
+                        <core-icon on-tap="{{toggleNav}}"
+                                   tabindex="0" 
                                    icon="menu">
                         </core-icon>
 
@@ -131,7 +132,8 @@
                         <core-icon icon="account-circle"></core-icon>
                         <p>{{Site.User.Name}}</p>
 
-                        <core-icon icon="more-vert"></core-icon>
+                        <core-icon icon="more-vert" 
+                                   tabindex="0"></core-icon>
 
                     </section>
                 </header>
@@ -152,7 +154,7 @@
                     <section data-pagename="view-login"
                              layout vertical center>
 
-                        <h2>Login</h2>
+                        <h1>Login</h1>
 
                         <label for="email">
                             Email
@@ -190,7 +192,7 @@
                              layout vertical center>
 
                         <section layout horizontal justified>
-                            <h2>Add Page</h2>
+                            <h1>Add Page</h1>
                             <button on-tap="{{home}}">
                                 <core-icon icon="close"></core-icon>
                             </button>
@@ -225,9 +227,38 @@
                         <section class="page" data-pagename="{{page.Name}}"
                                  layout vertical start>
 
-                            <h3>{{page.Name}}</h3>
+                            <h2>{{page.Name}}</h2>
 
-                            <section id="components"></section>
+                            <section id="components" layout horizontal wrap>
+                                <template repeat="{{component in page.Components}}">
+                                    <article data="{{component | stringify}}" on-tap="{{showEditComponent}}" layout vertical justified tabindex="0">
+
+                                        <h3>{{component.Name}}</h3>
+
+                                        <template repeat="{{prop in component.Props}}">
+                                            <section layout horizontal justified center>
+
+                                                <p><b>{{prop.Name}}</b></p>
+
+                                                <template if="{{isObject(prop.Value) && !isList(prop.Type)}}">
+                                                    <p class="hidden">Component</p>
+                                                </template>
+                                                <template if="{{isList(prop.Type)}}">
+                                                    <p class="hidden">{{prop.Type}}</p>
+                                                </template>
+                                                <template if="{{prop.Type === 'Image'}}">
+                                                    <p class='hidden'></p>
+                                                </template>
+                                                <template if="{{prop.Type !== 'Component' && !isList(prop.Type) && prop.Type !== 'Image' && !isObject(prop.Value)}}">
+                                                    <p class="hidden">{{prop.Value}}</p>
+                                                </template>
+
+                                            </section>
+                                        </template>
+
+                                    </article>
+                                </template>
+                            </section>
 
                         </section>
 

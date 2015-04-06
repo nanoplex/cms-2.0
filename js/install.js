@@ -24,7 +24,6 @@
         this.$.welcome.setAttribute("hidden", "");
         this.$.newUser.removeAttribute("hidden");
     };
-
     installer.ShowSite = function() {
 
         this.$.userStatus.innerHTML = "<paper-spinner active></paper-spinner>";
@@ -39,7 +38,6 @@
         }
 
     };
-
     installer.HandleUser = function(res) {
 
         if (res.detail.response.match(/true/) != null) {
@@ -48,14 +46,12 @@
         } else
             this.$.userStatus.innerHTML = res.detail.response;
     };
-
     installer.HandleSite = function(res) {
         if (res.detail.response.match(/true/) != null)
             window.location.href = "/index.html";
         else
             this.$.siteStatus.innerHTML = res.detail.response;
     };
-
     installer.Finish = function() {
         this.$.siteStatus.innerHTML = "<paper-spinner active></paper-spinner>";
 
@@ -64,5 +60,4 @@
         else
             this.$.siteStatus.innerHTML = "you must enter a name for your project";
     };
-
 })();

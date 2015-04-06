@@ -1,58 +1,72 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="mvc.Models.AdminSite">
-    <Position X="2.25" Y="0.75" Width="1.5" />
+  <Class Name="cms.Models.AdminSite">
+    <Position X="5" Y="4.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAABAAAAAAAAAIAAEAAAAAAgAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <HashCode>AAABAAAAAAAAAIAAEAAABAAgAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Models\AdminSite.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.Log">
-    <Position X="0.5" Y="4" Width="1.5" />
+  <Class Name="cms.Models.Component">
+    <Position X="9.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Models\AdminSite.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cms.Models.Prop">
+    <Position X="9.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAQAgAAAAAAA=</HashCode>
+      <FileName>Models\AdminSite.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cms.Models.Log">
+    <Position X="1.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Log.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.FileLog">
-    <Position X="2.25" Y="5.75" Width="1.5" />
+  <Class Name="cms.Models.FileLog">
+    <Position X="0.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Models\Log.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.EmailLog">
-    <Position X="2.25" Y="4.25" Width="1.5" />
+  <Class Name="cms.Models.EmailLog">
+    <Position X="2.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Models\Log.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.Page">
-    <Position X="4.75" Y="0.5" Width="1.5" />
+  <Class Name="cms.Models.Page">
+    <Position X="7.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAIAAAAAAAAAIAAGABAAAQBAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAEAAAAAAAAAAIAAGARAAAQBAAAAAAAIAAAAAAAAAAA=</HashCode>
       <FileName>Models\Page.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.Settings">
-    <Position X="7.25" Y="0.5" Width="1.5" />
+  <Class Name="cms.Models.Settings">
+    <Position X="7.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAACEABAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Settings.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.Site">
-    <Position X="0.5" Y="0.5" Width="1.5" />
+  <Class Name="cms.Models.Site">
+    <Position X="5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAgEABAAAQAAAAAAAAAgAAAAAAAAAA=</HashCode>
       <FileName>Models\Site.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="mvc.Models.User">
-    <Position X="7.25" Y="3.25" Width="1.5" />
+  <Class Name="cms.Models.User">
+    <Position X="9.5" Y="5.25" Width="1.5" />
     <NestedTypes>
-      <Class Name="mvc.Models.User.UnauthorizedException" Collapsed="true">
+      <Class Name="cms.Models.User.UnauthorizedException" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>Models\User.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -63,22 +77,22 @@
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Hash" Collapsed="true">
-    <Position X="9.75" Y="0.5" Width="1.5" />
+  <Class Name="Hash">
+    <Position X="14" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Hash.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="mongo.MongoDatabase">
-    <Position X="9.75" Y="1.25" Width="1.5" />
+    <Position X="11.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEAAAAAEAAAEAAAAIAAEAAAAAAAAAAAAACAAAAAAA=</HashCode>
       <FileName>Models\MongoDatabase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="mongo.MongoTable&lt;T&gt;">
-    <Position X="9.75" Y="4" Width="1.5" />
+    <Position X="11.75" Y="4" Width="1.5" />
     <NestedTypes>
       <Delegate Name="mongo.MongoTable&lt;T&gt;.QueryHandler" Collapsed="true">
         <TypeIdentifier>
@@ -96,12 +110,5 @@
       <FileName>Models\MongoTable.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="mvc.Models.IComponent">
-    <Position X="4.75" Y="3.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\IComponent.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
