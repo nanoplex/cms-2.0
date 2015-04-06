@@ -59,23 +59,25 @@
         for (var a = 0; a < pages.length; a++) {
             var page = pages[a];
 
-            for (var b = 0; b < page.Components.length; b++) {
-                var component = page.Components[b];
+            if (page.Components.length > 0) {
+                for (var b = 0; b < page.Components.length; b++) {
+                    var component = page.Components[b];
 
-                for (var c = 0; c < res.Components.length; c++) {
-                    if (res.Components[c].Name == component._t)
-                        selectedComponent = JSON.parse(JSON.stringify(res.Components[c]));
+                    for (var c = 0; c < res.Components.length; c++) {
+                        if (res.Components[c].Name == component._t)
+                            selectedComponent = JSON.parse(JSON.stringify(res.Components[c]));
+                    }
+
+                    for (var c = 0; c < selectedComponent.Props.length; c++) {
+                        selectedComponent.Props[c].Value = component[selectedComponent.Props[c].Name];
+                    }
+
+                    formattedComponents[formattedComponents.length] = {
+                        "_id": component._id,
+                        "Name": selectedComponent.Name,
+                        "Props": JSON.parse(JSON.stringify(selectedComponent.Props))
+                    };
                 }
-
-                for (var c = 0; c < selectedComponent.Props.length; c++) {
-                    selectedComponent.Props[c].Value = component[selectedComponent.Props[c].Name];
-                }
-
-                formattedComponents[formattedComponents.length] = {
-                    "_id": component._id,
-                    "Name": selectedComponent.Name,
-                    "Props": JSON.parse(JSON.stringify(selectedComponent.Props))
-                };
             }
             page.Components = formattedComponents;
         }
