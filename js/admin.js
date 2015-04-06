@@ -39,8 +39,13 @@
             
             if (page.LastPage !== undefined && page.LastPage.match(/^view-/) === null)
                 page.changeView(page.LastPage);
-            else
-                page.changeView(page.Site.Pages[0].Name);
+            else {
+                if (page.Site.Pages.length > 0)
+                    page.changeView(page.Site.Pages[0].Name);
+                else
+                    page.changeView("view-add-page");
+            }
+                
 
             console.log("site", page.Site);
         }
