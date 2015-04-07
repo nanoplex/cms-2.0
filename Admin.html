@@ -68,6 +68,13 @@
                    on-core-response="{{handleAuth}}">
         </core-ajax>
 
+        <core-ajax id="ajaxEditComponent"
+                   url="/admin/editContent"
+                   handleas="text"
+                   method="post"
+                   on-core-response="{{handleAuth}}">
+        </core-ajax>
+
         <!-- #endregion -->
 
         <core-drawer-panel forcenarrow="true">
@@ -298,10 +305,7 @@
 
                 <template repeat="{{component in Site.Components}}">
 
-                    <button data-name="{{component.Name}}"
-                            on-tap="{{showAddComponent}}">
-                        {{component.Name}}
-                    </button>
+                    <button on-tap="{{showAddComponent}}">{{component.Name}}</button>
 
                 </template>
 

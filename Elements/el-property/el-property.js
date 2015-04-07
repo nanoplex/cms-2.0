@@ -14,13 +14,11 @@
         },
         attached: function () {
             if (this.selectedComponent === undefined) {
-                for (var i = 0; i < page.Site.Components.length; i++) {
-                    var component = page.Site.Components[i];
+                var component = page.getComponentByType(this.Type.replace(/^List /, ""));
 
-                    if (component.Name == this.Type.replace(/^List /, ""))
-                        this.selectedComponent = component;
-                }
-            }
+                if (component !== null)
+                    this.selectedComponent = component;
+            } 
         },
         isList: function (value) {
             if (value.match(/^List/) !== null)

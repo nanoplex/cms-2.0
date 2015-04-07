@@ -5,6 +5,7 @@ using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 
@@ -26,11 +27,11 @@ namespace cms.Controllers
             var str = BsonExtensionMethods.ToJson<AdminSite>(site);
 
             str = Regex.Replace(Regex.Replace(Regex.Replace(Regex.Replace(Regex.Replace(
-                    str, 
+                    str,
                     @":\s*ObjectId\(", ":", RegexOptions.Multiline),
-                    @":\s*ISODate\(", ":", RegexOptions.Multiline), 
-                    @"System.String\[", "[", RegexOptions.Multiline), 
-                    @"\)\s*,", ",", RegexOptions.Multiline), 
+                    @":\s*ISODate\(", ":", RegexOptions.Multiline),
+                    @"System.String\[", "[", RegexOptions.Multiline),
+                    @"\)\s*,", ",", RegexOptions.Multiline),
                     @"\)\s*}", "}", RegexOptions.Multiline);
 
             return str;
@@ -175,27 +176,56 @@ namespace cms.Controllers
                 var page = Page.Db.Collection()
                     .FindOneAs<Page>(Query<Page>.EQ(p => p.Name, pageName));
 
-                foreach (var com in site.Components)
+                var obj = getComponent(
+                    component,
+                    componentName,
+                    page);
+
+                if (obj != null)
+                    page.Components.Add(obj);
+
+                Page.Db.Update(
+                    () => Query<Page>.EQ(p => p._id, page._id),
+                    () => Update<Page>.Set(p => p.Components, page.Components));
+
+                return Auth(true);
+            }
+            catch (MongoConnectionException)
+            {
+                return Auth(false);
+            }
+        }
+
+        [HttpPost]
+        public bool EditContent(string id, string component, string componentName, string pageName)
+        {
+            try
+            {
+                var page = Page.Db.Collection()
+                    .FindOneAs<Page>(Query<Page>.EQ(p => p.Name, pageName));
+
+                var Id = new ObjectId(id);
+
+                var obj = getComponent(
+                    component,
+                    componentName,
+                    page,
+                    Id);
+
+                if (obj != null)
                 {
-                    var c = Cast(com, new Component
+                    var t = page.Components.Where(c => c._id == Id).FirstOrDefault();
+
+                    foreach (PropertyInfo prop in obj.GetType().GetProperties())
                     {
-                        Name = "",
-                        Props = new List<Prop>()
-                    });
-
-                    if (c.Name == componentName)
-                    {
-
-                        if (page.Components == null)
-                            page.Components = new List<object>();
-
-                        dynamic obj = page.parseComponent(
-                            componentName,
-                            c.Props,
-                            component,
-                            Request.Files);
-
-                        page.Components.Add(obj);
+                        if (prop.CanWrite)
+                        {
+                            prop.SetValue(
+                                t,
+                                Convert.ChangeType(
+                                    prop.GetValue(obj, null),
+                                    prop.PropertyType));
+                        }
                     }
                 }
 
@@ -211,9 +241,40 @@ namespace cms.Controllers
             }
         }
 
-        private static T Cast<T>(Object x, T typeHolder)
+        private dynamic getComponent(string component, string componentName, Page page, ObjectId id = new ObjectId())
         {
-            return (T)x;
+            foreach (var com in site.Components)
+            {
+                var c = Cast(com, new Component
+                {
+                    Name = "",
+                    Props = new List<Prop>()
+                });
+
+                if (c.Name == componentName)
+                {
+
+                    if (page.Components == null)
+                        page.Components = new List<object>();
+
+                    dynamic obj = page.parseComponent(
+                        componentName,
+                        c.Props,
+                        component,
+                        Request.Files);
+
+                    if (id != new ObjectId())
+                        obj._id = id;
+
+                    return obj;
+                }
+            }
+            return null;
+        }
+
+        private static T Cast<T>(Object obj, T typeHolder)
+        {
+            return (T)obj;
         }
 
         public JsonResult Auth(JsonResult res)

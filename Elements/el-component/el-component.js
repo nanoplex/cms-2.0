@@ -5,7 +5,6 @@
         _id: undefined,
         Name: "loading",
         Props: [],
-        pagename: undefined,
         nested: false,
         ready: function () {
             if (this.nested)
@@ -13,13 +12,27 @@
         },
         finish: function () {
 
-            if (this._id == undefined)
-                this.Add();
-            else
-                this.Edit();
+            var props = this.$.components.querySelectorAll("el-property"),
+                inputs = [];
 
-            this.Props = null;
-            this.Name = null;
+            for (var i = 0; i < props.length; i++) {
+                var input = props[i].shadowRoot.querySelector("input");
+
+                if (input !== null)
+                    inputs[inputs.length] = input;
+                else
+                    inputs[inputs.length] = props[i].shadowRoot.querySelector("textarea");
+            }
+
+            if (page.validateInputs(inputs)) {
+                if (this._id == undefined)
+                    this.Add();
+                else
+                    this.Edit();
+
+                this.Props = null;
+                this.Name = null;
+            }
         },
         close: function () {
             page.changeView(page.LastPage);
@@ -64,26 +77,63 @@
             page.$.ajaxAddComponent.go();
         },
         Edit: function () {
-            // TODO
+            var images = [],
+                properties = document.querySelector("section[data-pagename=view-component] el-component")
+                    .shadowRoot.querySelectorAll("el-property");
+
+            for (var i = 0; i < properties.length; i++) {
+                images[images.length] = properties[i].shadowRoot.querySelector("input[type=file]");
+            }
+
+            page.$.ajaxEditComponent.body = new FormData();
+            page.$.ajaxEditComponent.contentType = null;
+
+            page.$.ajaxEditComponent.body.append(
+                "id",
+                this._id);
+
+            page.$.ajaxEditComponent.body.append(
+                "component",
+                JSON.stringify(this.getComponent()).replace(/"/g, "'"));
+
+            page.$.ajaxEditComponent.body.append(
+                "componentName",
+                this.Name);
+
+            page.$.ajaxEditComponent.body.append(
+                "pageName",
+                page.LastPage);
+
+            for (var a = 0; a < images.length; a++) {
+                if (images[a] != null) {
+                    for (var b = 0; b < images[a].files.length; b++) {
+                        var file = images[a].files[b];
+
+                        page.$.ajaxEditComponent.body.append(file.name, file);
+                    }
+                }
+            }
+
+            page.$.ajaxEditComponent.go();
         },
         getComponent: function (Props) {
             if (Props === undefined)
                 Props = this.Props;
 
-            console.log("props", Props);
-
             var comp = "{";
 
             for (var i = 0; i < Props.length; i++) {
 
-                if (Props[i].Type === "Component")
-                    comp += this.parseComponent(Props[i]);
-
-                else if (Props[i].Type.match(/^List\s*/) != null)
+                if (Props[i].Type.match(/^List\s*/) != null) {
                     comp += this.parseList(Props[i]);
+                }
+                else {
+                    if (page.getComponentByType(Props[i].Type) !== null)
+                        comp += this.parseComponent(Props[i]);
+                    else
+                        comp += '"' + Props[i].Name + '":"' + Props[i].Value + '",';
+                }
 
-                else
-                    comp += '"' + Props[i].Name + '":"' + Props[i].Value + '",';
             }
 
             comp = comp.replace(/,$/, "") + "}";
@@ -112,29 +162,28 @@
 
             comp += '"' + Prop.Name + '":';
 
-            for (var a = 0; a < page.Site.Components.length; a++) {
-                var component = page.Site.Components[a];
-
-                if (component.Name === Prop.Type.replace(/^List\s*/, ''))
-                    c = true;
-            }
+            if (page.getComponentByType(Prop.Type.replace(/^List\s*/, '')) !== null)
+                c = true;
 
             if (!c)
                 comp += JSON.stringify(Prop.Value) + ",";
             else {
                 comp += '[';
 
-                var innerComponents = Prop.Value;
+                console.log(Prop.Value);
 
-                for (var a = 0; a < innerComponents.length; a++) {
-                    var innerComponent = JSON.parse(innerComponents[a]);
-
-                    comp += JSON.stringify(this.getComponent(innerComponent.Props)) + ",";
+                for (var a = 0; a < Prop.Value.length; a++) {
+                    if (Prop.Value[a] !== undefined) {
+                        var data = JSON.parse(Prop.Value[a]);
+                        comp += "{";
+                        for (var b = 0; b < data.Props.length; b++) {
+                            comp += '"' + data.Props[b].Name + '":' + JSON.stringify(data.Props[b].Value) + ',';
+                        }
+                        comp = comp.replace(/,$/, "") + "},";
+                    }
                 }
 
-                comp = comp.replace(/,$/, "");
-
-                comp += '],';
+                comp = comp.replace(/,$/, "") + '],';
             }
 
             return comp;

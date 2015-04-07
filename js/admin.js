@@ -36,7 +36,7 @@
 
         if (res !== null) {
             page.Site = page.formatComponents(res);
-            
+
             if (page.LastPage !== undefined && page.LastPage.match(/^view-/) === null)
                 page.changeView(page.LastPage);
             else {
@@ -44,8 +44,9 @@
                     page.changeView(page.Site.Pages[0].Name);
                 else
                     page.changeView("view-add-page");
+
+                page.LastPage = page.Site.Pages[0].Name;
             }
-                
 
             console.log("site", page.Site);
         }
@@ -57,11 +58,11 @@
             formattedComponents = [];
 
         for (var a = 0; a < pages.length; a++) {
-            var page = pages[a];
+            var _page = pages[a];
 
-            if (page.Components.length > 0) {
-                for (var b = 0; b < page.Components.length; b++) {
-                    var component = page.Components[b];
+            if (_page.Components !== null) {
+                for (var b = 0; b < _page.Components.length; b++) {
+                    var component = _page.Components[b];
 
                     for (var c = 0; c < res.Components.length; c++) {
                         if (res.Components[c].Name == component._t)
@@ -75,11 +76,12 @@
                     formattedComponents[formattedComponents.length] = {
                         "_id": component._id,
                         "Name": selectedComponent.Name,
-                        "Props": JSON.parse(JSON.stringify(selectedComponent.Props))
+                        "Props": selectedComponent.Props
                     };
                 }
             }
-            page.Components = formattedComponents;
+
+            _page.Components = formattedComponents;
         }
 
         return res;
@@ -100,32 +102,49 @@
             return false;
     };
     page.login = function () {
-        var email = document.querySelector("input[name=email]"),
-            emailValid = email.validity.valid,
-            pass = document.querySelector("input[name=password]"),
-            passValid = pass.validity.valid;
+        var inputs = document.querySelectorAll("section[data-pagename=view-login] input");
 
         loginStatus = document.querySelector("section[data-pagename=view-login] .status");
 
-        if (emailValid && passValid) {
-
+        if (page.validateInputs(inputs)) {
             page.injectBoundHTML("<paper-spinner active><paper-spinner/>", loginStatus);
 
             page.$.ajaxLogin.go();
         }
-        else {
-            if (!emailValid)
-                email.focus();
-            else if (!passValid)
-                pass.focus();
-
+        else
             loginStatus.innerHTML = "";
+    };
+    page.validateInputs = function (inputs) {
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i] !== null) {
+                if (!inputs[i].validity.valid) {
+                    page.focusInputs(inputs);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    };
+    page.focusInputs = function (inputs) {
+        for (var i = 0; i < inputs.length; i++) {
+            if (!inputs[i].validity.valid) {
+                inputs[i].focus();
+                break;
+            }
         }
     };
     page.changeView = function (view) {
         page.LastPage = page.SelectedPage;
         page.SelectedPage = view;
         page.setTitle();
+    };
+    page.getComponentByType = function (type) {
+        for (var a = 0; a < page.Site.Components.length; a++) {
+            if (page.Site.Components[a].Name === type)
+                return page.Site.Components[a];
+        };
+        return null;
     };
     page.setTitle = function () {
         var title = document.querySelector("title");
@@ -284,25 +303,22 @@
         page.$.addOptions.setAttribute("hidden", "");
         page.$.addComponentOptions.removeAttribute("hidden");
     };
-    page.showAddComponent = function (e, detail, sender) {
+    page.showAddComponent = function (event, detail, sender) {
         var elComponent = new ElComponent(),
-        name = sender.getAttribute("data-name"),
-        component,
-        data;
+        component;
 
-        for (var i in page.Site.Components) {
-            if (page.Site.Components[i].Name === name)
-                component = page.Site.Components[i];
+        component = page.getComponentByType(event.currentTarget.innerText);
+
+        if (component !== null) {
+            elComponent.Name = component.Name;
+            elComponent.Props = component.Props;
+
+            page.$.viewComponent.innerHTML = '';
+            page.$.viewComponent.appendChild(elComponent);
+
+            page.changeView("view-component");
+
+            page.$.addComponentOptions.setAttribute("hidden", "");
         }
-
-        elComponent.Name = component.Name;
-        elComponent.Props = component.Props;
-
-        page.$.viewComponent.innerHTML = '';
-        page.$.viewComponent.appendChild(elComponent);
-
-        page.changeView("view-component");
-
-        page.$.addComponentOptions.setAttribute("hidden", "");
     }
 })();

@@ -18,7 +18,7 @@ namespace cms.Models
 	    public DateTime PublishDate { get; set; }
         public int Order { get; set; }
 	    public bool Visible { get; set; }
-	    public List<object> Components { get; set; }
+	    public List<dynamic> Components { get; set; }
 
         public static MongoTable<Page> Db = new MongoTable<Page>();
 

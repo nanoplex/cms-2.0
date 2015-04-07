@@ -13,7 +13,7 @@ namespace mongo
     {
         static string _Password = null;
         static string _Username = null;
-        static string _Host = "93.160.108.34";
+        static string _Host = "localhost";
         static string _Database = "cms";
 
         private static MongoDB.Driver.MongoDatabase Database { get; set; }
